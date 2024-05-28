@@ -60,6 +60,11 @@ export default class Board {
         return this
     }
 
+    emptyRow(rowIndex: number) {
+        this.grid[rowIndex] = new Array(this.size).fill(BoardTile.Unmarked)
+        return this
+    }
+
     get constraintsClone(): BoardConstraints {
         return {
             rows: this.constraints.rows.map(row => [...row]),
@@ -200,7 +205,8 @@ export default class Board {
     }
 
     emptyGrid() {
-        this.grid = new Array(this.size).fill(new Array(this.size).fill(BoardTile.Unmarked))
+        const newGrid = new Array(this.size).fill(new Array(this.size).fill(BoardTile.Unmarked))
+        this.grid = newGrid
         return this
     }
 

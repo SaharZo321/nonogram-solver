@@ -1,26 +1,30 @@
-import { useEffect, useRef, useState } from "react";
-import Board from "../../../../Board/Board";
-import { BoardContainerPage } from "../../../Board/PageLayout";
+import { useEffect, useState } from "react";
+import { BoardContainerPage } from "Components/Board/PageLayout";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Box, Button } from "@mui/material";
-import ParallelSolver from "../../../../Board/BoardSolvers";
+import Board from "Board/Board";
+import Solver, { StackSolver } from "Board/Solver";
 
 
 export default function BoardSolutions() {
     const location = useLocation()
-    const [shownBoard, setShownBoard] = useState(new Board(location.state ? location.state : { size: 10 }))
-    const solverRef = useRef(new ParallelSolver(shownBoard))
+    const [shownBoard, setShownBoard] = useState(new Board(location.state ? location.state : { size: 10 }).emptyGrid())
     const navigate = useNavigate()
     useEffect(() => {
         if (!location.state) {
             alert('Board not found, returning to board creation')
             navigate('/ai-solver/board-creation')
         } else {
-            const solution = solverRef.current.findNextSolution()
-            if (solution) {
-                const { board } = solution
-                setShownBoard(board)
-            }
+
+            setTimeout(() => {
+                const solution = Solver(new Board(location.state))
+                setShownBoard(solution.board)
+
+                console.log(solution.steps)
+                // StackSolver(new Board(location.state).emptyGrid())
+            }, 1000)
+            
+
         }
     }, [])
     return (location.state ?

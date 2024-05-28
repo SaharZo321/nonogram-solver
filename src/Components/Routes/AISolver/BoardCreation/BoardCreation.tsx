@@ -79,9 +79,9 @@ export default function BoardCreation() {
     }, 100)
 
 
-    const handleMarkingChanceChange = useCallback(useDebouncedCallback((chance: number) => {
+    const handleMarkingChanceChange = useCallback((chance: number) => {
         setMarkingChance(chance)
-    }, 0), [])
+    }, [])
 
     const handleFlipVertically = useCallback(() => {
         dispatchBoard({ type: 'flip-vertically' })
@@ -105,7 +105,7 @@ export default function BoardCreation() {
 
     const randomizeBoard = useCallback(() => {
         dispatchBoard({ type: 'randomize', markingChance: randomMarkingChance })
-    }, [])
+    }, [randomMarkingChance])
 
     return (
 
@@ -164,7 +164,7 @@ export default function BoardCreation() {
                             dispatchBoard({ type: 'clear-board' })
                         }}
                     >
-                        Clear Board
+                        reset Board
                     </Button>
                 </BoardUtilsItem>
                 <BoardUtilsItem>
@@ -179,7 +179,7 @@ export default function BoardCreation() {
                             }
                         }}
                     >
-                        Show me all solutions
+                        SHOW ME THE SOLUTION
                     </Button>
                 </BoardUtilsItem>
 

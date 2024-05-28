@@ -6,13 +6,14 @@ import { Outlet, useMatch } from "react-router-dom";
 const settings = {
 	hoverColor: 'rgba(150,150,150,0.3)',
 }
+const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
 
 export const SettingsContext = createContext(settings)
 const initColorModeContext = { toggleColorMode: (mode?: PaletteMode) => { } }
 export const ColorModeContext = createContext(initColorModeContext);
 
 function App() {
-	const [mode, setMode] = useState<PaletteMode>('light');
+	const [mode, setMode] = useState<PaletteMode>(isDarkMode ? 'dark' : 'light');
 	const colorMode = useMemo(
 		() => ({
 			toggleColorMode: (newMode?: PaletteMode) => {
