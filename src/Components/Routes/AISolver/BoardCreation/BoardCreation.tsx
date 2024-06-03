@@ -7,6 +7,8 @@ import { useDebouncedCallback } from "use-debounce";
 import { Flip, RotateLeftRounded, RotateRightRounded } from "@mui/icons-material";
 import { BoardContainerPage } from "../../../Board/PageLayout";
 import { useNavigate } from "react-router-dom";
+import { StyledButton } from "Components/General/StyledComponents";
+import { GridBitArray } from "Board/GridBitArray";
 
 const defaultSize = 10
 const demoBoard = new Board({ size: defaultSize })
@@ -43,7 +45,8 @@ type BoardReducerActions = {
 const boardReducer = (state: Board, action: BoardReducerActions) => {
     switch (action.type) {
         case "randomize":
-            return state.clone.randomize(action.markingChance ? action.markingChance : 0.5);
+            const clone = state.clone.randomize(action.markingChance ? action.markingChance : 0.5);
+            return clone
         case "clear-board":
             return new Board({ size: state.size });
         case "change-size":
@@ -74,6 +77,7 @@ export default function BoardCreation() {
     const [board, dispatchBoard] = useReducer(boardReducer, demoBoard)
     const [randomMarkingChance, setMarkingChance] = useState(defaultChance)
     const navigate = useNavigate()
+
     const handleBoardSizeChange = useDebouncedCallback((size: number) => {
         dispatchBoard({ type: 'change-size', size })
     }, 100)
@@ -231,10 +235,6 @@ const RandomizingUtility = (props: RandomizingUtilityProps) => {
 
 
 
-const StyledButton = styled(Button)({
-    width: '64px',
-    height: '64px'
-})
 
 type BoardUtilsItemProps = PropsWithChildren<{
     text?: string,

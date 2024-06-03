@@ -30,7 +30,7 @@ export default class Board {
     constructor(
         {
             size,
-            grid = new Array(size).fill(new Array(size).fill(BoardTile.Unmarked)),
+            grid = new Array(size).fill([]).map(() => (new Array(size).fill(BoardTile.Unmarked))),
             constraints = {
                 rows: new Array(size).fill([]),
                 columns: new Array(size).fill([]),

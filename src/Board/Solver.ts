@@ -1,4 +1,5 @@
 import Board, { LineConstraint, BoardTile } from "./Board";
+import { GridBitArray } from "./GridBitArray";
 
 export type BoardSolution = {
     isSolved: boolean,
@@ -10,11 +11,11 @@ type BoardLine = BoardTile[]
 type BoardLineSolutions = BoardLine[]
 
 
-export default function Solver(boardRefrence: Board): {board: Board, steps: Board[]} {
+export default function Solver(boardRefrence: Board): {board: Board, steps: GridBitArray[]} {
 
     const emptyBoard = boardRefrence.clone.emptyGrid()
     const allRowsSolutions = findAllRowsSolutions(emptyBoard)
-    const steps: Board[] = [emptyBoard]
+    const steps: GridBitArray[] = [GridBitArray.convertBoard(emptyBoard)]
 
     function Solve(
         board: Board,
@@ -27,7 +28,8 @@ export default function Solver(boardRefrence: Board): {board: Board, steps: Boar
 
         for (let i = 0; i < thisRowsSolutions.length; i++) {
             const newBoard = board.clone.setRow(rowIndex, thisRowsSolutions[i]);
-            steps.push(newBoard)
+            const gridSnapshot = GridBitArray.convertBoard(newBoard)
+            steps.push(gridSnapshot)
             if (!isRowValid(newBoard, rowIndex)) { continue; }
             const solution = Solve(newBoard, rowIndex + 1)
             if (!solution) { continue; }
@@ -109,7 +111,7 @@ function verifyLine(lineConstraint: LineConstraint, line: BoardLine, lastIndexTo
                     minUnsolvedLength -= markedTilesCounter + 1;
                     markedTilesCounter = 0;
                     lineConstraintIndex++;
-                } else if (minUnsolvedLength > line.length - tileIndex) {
+                } else if (minUnsolvedLength >= line.length - tileIndex) {
                     //there is not enough room for the left constraints
                     return false;
                 }
@@ -134,6 +136,7 @@ function verifyLine(lineConstraint: LineConstraint, line: BoardLine, lastIndexTo
     }
     return true;
 }
+
 function isRowValid(board: Board, rowIndex: number): boolean {
     const columnsArray = getColumnsArray(board);
     return columnsArray.every((column, columnIndex) => {
