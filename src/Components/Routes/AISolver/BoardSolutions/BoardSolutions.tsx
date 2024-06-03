@@ -3,9 +3,10 @@ import { BoardContainerPage } from "Components/Board/PageLayout";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Box, Button, IconButton, Slider, useTheme } from "@mui/material";
 import Board from "Board/Board";
-import Solver, { StackSolver } from "Board/Solver";
+import Solver from "Board/Solver";
 import { NavigateBefore, NavigateNext, Pause, PlayArrow } from "@mui/icons-material";
 import { GridBitArray } from "Board/GridBitArray";
+import { StyledSlider } from "Components/General/StyledComponents";
 
 
 export default function BoardSolutions() {
@@ -92,7 +93,7 @@ export default function BoardSolutions() {
                         <NavigateNext fontSize="large" />
                     </IconButton>
                 </Box>
-                <Slider
+                <StyledSlider
                     disabled={steps.length === 0}
                     aria-label="steps-indicator"
                     value={position}
@@ -101,30 +102,6 @@ export default function BoardSolutions() {
                     max={steps.length - 1}
                     onChange={(_, value) => onStepsSliderChange(value as number)}
                     onChangeCommitted={() => setPlayingState(prev => ({ ...prev, isPlaying: prev.mode }))}
-                    sx={{
-                        height: 4,
-                        '& .MuiSlider-thumb': {
-                            width: 16,
-                            height: 16,
-                            transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
-                            '&::before': {
-                                boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)',
-                            },
-                            '&:hover, &.Mui-focusVisible': {
-                                boxShadow: `0px 0px 0px 8px ${theme.palette.mode === 'dark'
-                                    ? 'rgb(255 255 255 / 16%)'
-                                    : 'rgb(0 0 0 / 16%)'
-                                    }`,
-                            },
-                            '&.Mui-active': {
-                                width: 24,
-                                height: 24,
-                            },
-                        },
-                        '& .MuiSlider-rail': {
-                            opacity: 0.28,
-                        },
-                    }}
                 />
                 <Button variant="contained" size='large' onClick={() => navigate('/ai-solver/board-creation')} sx={{ fontWeight: 'bold' }}>
                     Create Another Board

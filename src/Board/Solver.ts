@@ -42,49 +42,6 @@ export default function Solver(boardRefrence: Board): {board: Board, steps: Grid
 
 }
 
-export function StackSolver(boardRefrence: Board) {
-
-    const allRowsSolutions = findAllRowsSolutions(boardRefrence)
-    const steps: { rowSolution: BoardLine, rowSolutionIndex: number }[] = []
-    let newBoard = boardRefrence.clone
-    let currentRowSolutions = allRowsSolutions[0];
-    let rowSolutionIndex = 0
-
-    while (steps.length < newBoard.size) {
-        const checkedRowSolution = currentRowSolutions[rowSolutionIndex]
-        newBoard = newBoard.clone.setRow(steps.length, checkedRowSolution);
-        console.log(newBoard)
-
-        if (isRowValid(newBoard, steps.length)) {
-            steps.push({ rowSolution: checkedRowSolution, rowSolutionIndex: rowSolutionIndex })
-            rowSolutionIndex = 0;
-            currentRowSolutions = allRowsSolutions[steps.length]
-        } else {
-
-            rowSolutionIndex++
-
-            if (rowSolutionIndex === currentRowSolutions.length) {
-                // got to last row solution and there is no valid solution to the board
-                steps.pop()
-                newBoard = newBoard.clone.emptyRow(steps.length)
-                rowSolutionIndex = steps[steps.length - 1].rowSolutionIndex + 1
-                while (steps[steps.length - 1].rowSolutionIndex + 1 >= allRowsSolutions[steps.length].length) {
-                    steps.pop()
-                    newBoard = newBoard.clone.emptyRow(steps.length)
-                    rowSolutionIndex = steps[steps.length - 1].rowSolutionIndex + 1
-                }
-            }
-
-        }
-
-    }
-    const solution = boardRefrence.clone.emptyGrid()
-    steps.forEach((row, index) => {
-        solution.setRow(index, row.rowSolution)
-    })
-    console.log(solution)
-}
-
 function verifyLine(lineConstraint: LineConstraint, line: BoardLine, lastIndexToCheck = line.length - 1) {
     let lineConstraintIndex = 0;
     let markedTilesCounter = 0;

@@ -7,7 +7,7 @@ import { useDebouncedCallback } from "use-debounce";
 import { Flip, RotateLeftRounded, RotateRightRounded } from "@mui/icons-material";
 import { BoardContainerPage } from "../../../Board/PageLayout";
 import { useNavigate } from "react-router-dom";
-import { StyledButton } from "Components/General/StyledComponents";
+import { StyledButton, StyledSlider } from "Components/General/StyledComponents";
 import { GridBitArray } from "Board/GridBitArray";
 
 const defaultSize = 10
@@ -121,7 +121,7 @@ export default function BoardCreation() {
         >
             <List>
                 <BoardUtilsItem text="Change Board Size">
-                    <Slider
+                    <StyledSlider
                         min={5}
                         max={20}
                         step={1}
@@ -219,7 +219,7 @@ const RandomizingUtility = (props: RandomizingUtilityProps) => {
                 <Typography>
                     Chance
                 </Typography>
-                <Slider
+                <StyledSlider
                     min={0.01}
                     max={1}
                     step={0.01}
