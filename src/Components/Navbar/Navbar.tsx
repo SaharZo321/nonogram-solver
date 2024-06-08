@@ -1,15 +1,25 @@
 import { Brightness4, Brightness7, ChevronLeft as ChevronLeftIcon, Menu as MenuIcon } from "@mui/icons-material";
 import { AppBar, Box, Button, IconButton, List, ListItem, Toolbar, Typography, useTheme } from "@mui/material";
-import { PropsWithChildren, useContext, useState } from "react";
+import { PropsWithChildren, useCallback, useContext, useState } from "react";
 import AppDrawer from "./AppDrawer";
-import { ColorModeContext } from "../../App";
-import { Link, NavLink, useMatch } from "react-router-dom";
+import { ColorModeContext, SettingsContext } from "../../App";
+import { Link, useMatch } from "react-router-dom";
 import styled from "@emotion/styled";
+import LoginDialog from "./LoginDialog";
 
 export default function Navbar() {
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false)
     const theme = useTheme()
     const colorMode = useContext(ColorModeContext)
+    const [loginDialogOpen, setLoginDialogOpen] = useState(false)
+    const { username, set } = useContext(SettingsContext)
+
+    const onLogin = useCallback((newUsername: string) => {
+       set('username', newUsername)
+       setLoginDialogOpen(false) 
+    },[set])
+
+
     return (
         <>
             <AppBar sx={{
@@ -40,10 +50,15 @@ export default function Navbar() {
                     <IconButton onClick={() => colorMode.toggleColorMode()} color="inherit" sx={{ ml: 'auto' }}>
                         {theme.palette.mode === 'light' ? <Brightness4 /> : <Brightness7 />}
                     </IconButton>
-                    <Button color="inherit">Login</Button>
+                    <Button color="inherit"
+                        onClick={() => setLoginDialogOpen(true)}
+                    >
+                        {username ? username : 'Sign In'}
+                    </Button>
                 </Toolbar>
             </AppBar>
             <AppDrawer open={drawerOpen} onClose={setDrawerOpen} />
+            <LoginDialog open={loginDialogOpen} onClose={() => setLoginDialogOpen(false)} onLogin={onLogin}/>
         </>
     )
 }
