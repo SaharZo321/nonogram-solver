@@ -52,7 +52,7 @@ since it is a bit heavy...
 
 However, this got me to some trouble - **THERE WERE SO MANY STEPS**
 
-With a large board, a solution can have more than **100,000 steps**, which cost me more memory than I have on my computer!
+With a large board, a solution can have more than **10,000,000 steps**, which cost me more memory than I have on my computer!
 
 I had to manage the snapshot to use the lowest amount of memory. Then, I found the perfect solution - **BIT ARRAYS**
 
