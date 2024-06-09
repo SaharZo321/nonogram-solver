@@ -1,11 +1,13 @@
-import { Brightness4, Brightness7, ChevronLeft as ChevronLeftIcon, Menu as MenuIcon } from "@mui/icons-material";
-import { AppBar, Box, Button, IconButton, List, ListItem, Toolbar, Typography, useTheme } from "@mui/material";
-import { PropsWithChildren, useCallback, useContext, useState } from "react";
+import { AccountCircle, Brightness4, Brightness7, ChevronLeft as ChevronLeftIcon, Menu as MenuIcon } from "@mui/icons-material";
+import { AppBar, Box, Button, IconButton,  Menu, MenuItem, Toolbar, Typography, useTheme } from "@mui/material";
+import { MouseEvent, PropsWithChildren, useCallback, useContext, useState } from "react";
 import AppDrawer from "./AppDrawer";
 import { ColorModeContext, SettingsContext } from "../../App";
 import { Link, useMatch } from "react-router-dom";
 import styled from "@emotion/styled";
 import LoginDialog from "./LoginDialog";
+
+const menuItems: string[] = ['ITEM 1', 'ITEM 2', 'LOGOUT']
 
 export default function Navbar() {
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false)
@@ -13,11 +15,24 @@ export default function Navbar() {
     const colorMode = useContext(ColorModeContext)
     const [loginDialogOpen, setLoginDialogOpen] = useState(false)
     const { username, set } = useContext(SettingsContext)
+    const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null)
+
+
+    const handleCloseUserMenu = useCallback((event: MouseEvent<HTMLElement>) => {
+        setAnchorElUser(null)
+        const id = event.currentTarget.id
+        id === 'LOGOUT' && 
+            set('username', "")
+    }, [set])
+
+    const handleOpenUserMenu = useCallback((event: MouseEvent<HTMLElement>) => {
+        setAnchorElUser(event.currentTarget)
+    }, [])
 
     const onLogin = useCallback((newUsername: string) => {
-       set('username', newUsername)
-       setLoginDialogOpen(false) 
-    },[set])
+        set('username', newUsername)
+        setLoginDialogOpen(false)
+    }, [set])
 
 
     return (
@@ -50,15 +65,50 @@ export default function Navbar() {
                     <IconButton onClick={() => colorMode.toggleColorMode()} color="inherit" sx={{ ml: 'auto' }}>
                         {theme.palette.mode === 'light' ? <Brightness4 /> : <Brightness7 />}
                     </IconButton>
-                    <Button color="inherit"
-                        onClick={() => setLoginDialogOpen(true)}
+                    {
+                        username ?
+                            <Button
+                                color="inherit"
+                                onClick={handleOpenUserMenu}
+                            >
+                                <Box display="flex" gap="4px" alignItems="center">
+                                    <AccountCircle />
+                                    {username}
+                                </Box>
+                            </Button > :
+                            <Button
+                                color="inherit"
+                                onClick={() => setLoginDialogOpen(true)}
+                            >
+                                Sign In
+                            </Button>
+                    }
+                    <Menu
+                        sx={{ mt: '45px' }}
+                        id="menu-appbar"
+                        anchorEl={anchorElUser}
+                        anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        keepMounted
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        open={Boolean(anchorElUser)}
+                        onClose={handleCloseUserMenu}
                     >
-                        {username ? username : 'Sign In'}
-                    </Button>
+                        {menuItems.map((item) => (
+                            <MenuItem key={item} id={item} onClick={handleCloseUserMenu}>
+                                <Typography textAlign="center">{item}</Typography>
+                            </MenuItem>
+                        ))}
+                    </Menu>
                 </Toolbar>
             </AppBar>
             <AppDrawer open={drawerOpen} onClose={setDrawerOpen} />
-            <LoginDialog open={loginDialogOpen} onClose={() => setLoginDialogOpen(false)} onLogin={onLogin}/>
+            <LoginDialog open={loginDialogOpen} onClose={() => setLoginDialogOpen(false)} onLogin={onLogin} />
         </>
     )
 }

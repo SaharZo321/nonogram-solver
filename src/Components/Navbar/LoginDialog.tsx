@@ -32,7 +32,10 @@ export default function LoginDialog(props: LoginDialogProps) {
     }, [])
 
     useEffect(() => {
-        setCredentials({ username: "", password: "" })
+        if(props.open) {
+            setCredentials({ username: "", password: "" })
+            setShowPassword(false)
+        }
     }, [props.open])
 
     const isPasswordOk = useCallback(() => Boolean(credentials.password.match(passwordRegex)), [credentials.password])
