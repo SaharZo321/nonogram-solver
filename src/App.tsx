@@ -42,10 +42,6 @@ function App() {
 
 	}, [])
 
-	useEffect(() => {
-		console.log(settings)
-	}, [settings])
-
 	const colorMode = useMemo(
 		() => ({
 			toggleColorMode: (newMode?: PaletteMode) => {

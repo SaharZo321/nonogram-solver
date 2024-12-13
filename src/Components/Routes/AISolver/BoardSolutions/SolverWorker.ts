@@ -1,25 +1,27 @@
-import Board, { LineConstraint, BoardTile } from "./Board";
-import { GridBitArray } from "./GridBitArray";
+import Board, { LineConstraint, BoardTile } from "Board/Board";
+import { GridBitArray } from "Board/GridBitArray";
 
-export type BoardSolution = {
-    isSolved: boolean,
-    board: Board
-    nextSolutionRowIndexes?: number[]
+self.onmessage = (event) => {
+    const boardReference = new Board(event.data)
+    const result = Solver(boardReference)
+    self.postMessage(result)
 }
 
 type BoardLine = BoardTile[]
 type BoardLineSolutions = BoardLine[]
+export type Solution = { board: Board, steps: number[][] }
 
+function Solver(boardReference: Board): Solution {
 
-export default function Solver(boardRefrence: Board): {board: Board, steps: GridBitArray[]} {
-
-    const emptyBoard = boardRefrence.clone.emptyGrid()
+    const emptyBoard = boardReference.clone.emptyGrid()
     const allRowsSolutions = findAllRowsSolutions(emptyBoard)
-    const steps: GridBitArray[] = [GridBitArray.convertBoard(emptyBoard)]
+    console.log("found all rows solutions")
+    const steps: number[][] = [GridBitArray.convertBoard(emptyBoard)]
 
     function Solve(
         board: Board,
-        rowIndex = 0): Board | undefined {
+        rowIndex = 0,
+    ): Board | undefined {
 
         if (rowIndex === allRowsSolutions.length) {
             return board
@@ -28,7 +30,7 @@ export default function Solver(boardRefrence: Board): {board: Board, steps: Grid
 
         for (let i = 0; i < thisRowsSolutions.length; i++) {
             const newBoard = board.clone.setRow(rowIndex, thisRowsSolutions[i]);
-            const gridSnapshot = GridBitArray.convertBoard(newBoard)
+            const gridSnapshot = GridBitArray.convertBoardFast(newBoard)
             steps.push(gridSnapshot)
             if (!isRowValid(newBoard, rowIndex)) { continue; }
             const solution = Solve(newBoard, rowIndex + 1)
@@ -37,8 +39,8 @@ export default function Solver(boardRefrence: Board): {board: Board, steps: Grid
         }
         return undefined;
     }
-    const solution = Solve(boardRefrence.emptyGrid())
-    return !solution ? { board: boardRefrence.emptyGrid(), steps: [] } : { board: solution, steps }
+    const solution = Solve(boardReference.emptyGrid())
+    return !solution ? { board: boardReference.emptyGrid(), steps: [] } : { board: solution, steps }
 
 }
 

@@ -1,68 +1,68 @@
 import Board, { BoardConstraints, BoardGrid, BoardTile } from "./Board";
 
 export class GridBitArray {
-    private bits: number[];
 
-    constructor(tileNumber: number) {
-        this.bits = new Array(Math.ceil(tileNumber / 32)).fill(0)
+    private static CHUNK_SIZE = 32
+
+    private static getEmptyArray(tileNumber: number): number[] {
+        return new Array(Math.ceil(tileNumber / this.CHUNK_SIZE)).fill(0)
     }
 
-    static convertBoard(board: Board) {
-        const tileNumber = board.size * board.size;
-        const array = new GridBitArray(tileNumber)
+
+    static convertBoard(board: Board): number[] {
+        const tileNumber = board.size * board.size
+        const bits = this.getEmptyArray(tileNumber)
         board.grid.forEach((row, rowIndex) => {
             row.forEach((tile, columnIndex) => {
-                array.set({ row: rowIndex, column: columnIndex }, board.size, tile)
+                this.set({ row: rowIndex, column: columnIndex }, board.size, tile, bits)
             })
         })
-        return array
+        return bits
     }
 
+    static convertBoardFast(board: Board): number[] {
+        const longArray = board.gridClone.reduce((accumulator, currentRow) => accumulator.concat(currentRow), [])
+        const tileNumber = longArray.length;
+        const bits = this.getEmptyArray(tileNumber)
 
+        for (let i = 0; i < tileNumber; i += this.CHUNK_SIZE) {
+            const chunk = longArray.slice(i, i + this.CHUNK_SIZE).reverse().join('');
+            const number = parseInt(chunk, 2);
+            bits[Math.floor(i / this.CHUNK_SIZE)] = number;
+        }
 
-    set(position: { row: number, column: number }, gridSize: number, tile: BoardTile) {
+        return bits;
+    }
+
+    private static set(position: { row: number, column: number }, gridSize: number, tile: BoardTile, bits: number[]) {
         const index = position.row * gridSize + position.column
         const wordIndex = Math.floor(index / 32);
         const bitIndex = index % 32;
         if (tile === BoardTile.Marked) {
-            this.bits[wordIndex] |= (1 << bitIndex);
+            bits[wordIndex] |= (1 << bitIndex);
         } else {
-            this.bits[wordIndex] &= ~(1 << bitIndex);
+            bits[wordIndex] &= ~(1 << bitIndex);
         }
     }
 
-    get(position: { row: number, column: number }, gridSize: number): number {
+    private static get(position: { row: number, column: number }, gridSize: number, bits: number[]): number {
         const index = position.row * gridSize + position.column
         const wordIndex = Math.floor(index / 32);
-        const bitIndex = index % 32;
+        const bitIndex = (index % 32);
 
-        return (this.bits[wordIndex] >> bitIndex) & 1;
+        return (bits[wordIndex] >> bitIndex) & 1;
     }
 
-    private getGrid(gridSize: number) {
+    static getGrid(gridSize: number, bits: number[]): BoardGrid {
         const grid: BoardGrid = []
-        let str = ''
         for (let row = 0; row < gridSize; row++) {
             const rowArr = new Array(gridSize).fill(0)
             for (let column = 0; column < gridSize; column++) {
-                const tile = this.get({ row, column }, gridSize)
-                str += tile
+                const tile = this.get({ row, column }, gridSize, bits)
                 rowArr[column] = tile as BoardTile
             }
             grid.push(rowArr)
         }
-        // console.log(grid, str)
         return grid
-    }
-
-    getBoard(boardTemplate: {size: number, constraints: BoardConstraints}): Board {
-        const grid = this.getGrid(boardTemplate.size)
-        return new Board({...boardTemplate ,grid})
-    }
-
-    clone(): GridBitArray {
-        const clone = new GridBitArray(0);
-        clone.bits = this.bits.slice();
-        return clone;
     }
 }

@@ -40,6 +40,5 @@
   "main": "dist-electron/main.js",
   "build": {
     "appId": "com.Sahar.Sahargram"
-
   }
 }

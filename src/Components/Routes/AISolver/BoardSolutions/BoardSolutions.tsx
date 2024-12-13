@@ -1,41 +1,53 @@
 import { useCallback, useEffect, useState } from "react";
 import { BoardContainerPage } from "Components/Board/PageLayout";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Box, Button, IconButton, Slider, useTheme } from "@mui/material";
+import { Box, Button, CircularProgress, IconButton, useTheme } from "@mui/material";
 import Board from "Board/Board";
-import Solver from "Board/Solver";
 import { NavigateBefore, NavigateNext, Pause, PlayArrow } from "@mui/icons-material";
 import { GridBitArray } from "Board/GridBitArray";
 import { StyledSlider } from "Components/General/StyledComponents";
+import { Solution } from "./SolverWorker";
+
+
 
 
 export default function BoardSolutions() {
     const location = useLocation()
     const [shownBoard, setShownBoard] = useState(new Board(location.state ? location.state : { size: 10 }).emptyGrid())
-    const [steps, setSteps] = useState<GridBitArray[]>([])
+    const [steps, setSteps] = useState<number[][]>([])
     const [position, setPosition] = useState(0)
     const [playingState, setPlayingState] = useState({ isPlaying: false, mode: false })
     const [animationParams, setAnimationParams] = useState({ step: 1, interval: 100 })
     const navigate = useNavigate()
-    const theme = useTheme()
+
+
+
     useEffect(() => {
         if (!location.state) {
             alert('Board not found, returning to board creation')
             navigate('/ai-solver/board-creation')
         } else {
 
-            const timeout = setTimeout(() => {
-                const solution = Solver(new Board(location.state))
-                setShownBoard(solution.steps[0].getBoard(location.state))
+            const solverWorker = new Worker(new URL("./SolverWorker.ts", import.meta.url), { type: "module" })
+
+            solverWorker.onmessage = (event) => {
+                const solution: Solution = event.data;
+                console.log(solution)
+                const grid = GridBitArray.getGrid(location.state.size, solution.steps[0])
+                setShownBoard(new Board({ ...location.state, grid }))
                 setSteps(solution.steps)
                 const step = 1
                 const interval = Math.min(Math.max(Math.ceil(30000 / solution.steps.length), 5), 800)
                 setAnimationParams({ step, interval })
                 console.log(solution.steps.length)
-                // StackSolver(new Board(location.state).emptyGrid())
-            }, 1000)
+            }
+            const timeout = setTimeout(() => solverWorker.postMessage(location.state), 500)
 
-            return () => clearTimeout(timeout)
+
+            return () => {
+                clearTimeout(timeout)
+                solverWorker.terminate()
+            }
         }
     }, [])
     useEffect(() => {
@@ -45,10 +57,12 @@ export default function BoardSolutions() {
                 if (nextPosition < 0 || nextPosition >= steps.length) {
                     setPlayingState({ isPlaying: false, mode: false })
                     setPosition(0)
-                    setShownBoard(steps[steps.length - 1].getBoard(location.state))
+                    const grid = GridBitArray.getGrid(location.state.size, steps[steps.length - 1])
+                    setShownBoard(new Board({ ...location.state, grid }))
                 } else {
                     setPosition(nextPosition)
-                    setShownBoard(steps[nextPosition].getBoard(location.state))
+                    const grid = GridBitArray.getGrid(location.state.size, steps[nextPosition])
+                    setShownBoard(new Board({ ...location.state, grid }))
                 }
             }, animationParams.interval)
             return () => clearInterval(interval)
@@ -59,7 +73,8 @@ export default function BoardSolutions() {
         const newPosition = (position + steps.length) % steps.length
         setPosition(newPosition)
         setPlayingState(prev => ({ ...prev, isPlaying: false }))
-        setShownBoard(steps[newPosition].getBoard(location.state))
+        const grid = GridBitArray.getGrid(location.state.size, steps[newPosition])
+        setShownBoard(new Board({ ...location.state, grid }))
     }, [steps])
 
     return (location.state ?
@@ -74,16 +89,20 @@ export default function BoardSolutions() {
                     >
                         <NavigateBefore fontSize="large" />
                     </IconButton>
-                    <IconButton
-                        size="large"
-                        color='primary'
-                        onClick={() => setPlayingState(prev => ({ isPlaying: !prev.isPlaying, mode: !prev.isPlaying }))}
-                        disabled={steps.length === 0}>
-                        {
-                            playingState.isPlaying ?
-                                <Pause fontSize="large" /> :
-                                <PlayArrow fontSize="large" />}
-                    </IconButton>
+                    {steps.length !== 0 ?
+                        <IconButton
+                            size="large"
+                            color='primary'
+                            onClick={() => setPlayingState(prev => ({ isPlaying: !prev.isPlaying, mode: !prev.isPlaying }))}
+                        >
+                            {
+                                playingState.isPlaying ?
+                                    <Pause fontSize="large" /> :
+                                    <PlayArrow fontSize="large" />
+                            }
+                        </IconButton> :
+                        <CircularProgress size={35} sx={{ marginY: "auto" }} />
+                    }
                     <IconButton
                         size="large"
                         color='primary'
@@ -106,8 +125,11 @@ export default function BoardSolutions() {
                 <Button variant="contained" size='large' onClick={() => navigate('/ai-solver/board-creation')} sx={{ fontWeight: 'bold' }}>
                     Create Another Board
                 </Button>
+                <Box display='flex' justifyContent='space-around'>
+
+                </Box>
             </Box>
-        </BoardContainerPage> :
+        </BoardContainerPage > :
         <></>
     )
 }

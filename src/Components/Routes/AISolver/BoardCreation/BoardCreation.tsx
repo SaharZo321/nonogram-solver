@@ -1,14 +1,13 @@
-import { Box, Button, Dialog, FormControlLabel, IconButton, List, ListItem, Paper, Slider, Typography, useTheme } from "@mui/material";
+import { Box, Button, List, ListItem, Typography, } from "@mui/material";
 
 import Board, { BoardTile, Position } from "../../../../Board/Board";
-import { PropsWithChildren, createContext, useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
+import { PropsWithChildren, useCallback, useReducer, useState } from "react";
 import styled from "@emotion/styled";
 import { useDebouncedCallback } from "use-debounce";
 import { Flip, RotateLeftRounded, RotateRightRounded } from "@mui/icons-material";
 import { BoardContainerPage } from "../../../Board/PageLayout";
 import { useNavigate } from "react-router-dom";
 import { StyledButton, StyledSlider } from "Components/General/StyledComponents";
-import { GridBitArray } from "Board/GridBitArray";
 
 const defaultSize = 10
 const demoBoard = new Board({ size: defaultSize })
@@ -186,7 +185,12 @@ export default function BoardCreation() {
                         SHOW ME THE SOLUTION
                     </Button>
                 </BoardUtilsItem>
-
+                <BoardUtilsItem>
+                    <Button variant="contained" size='large' sx={{ fontWeight: 'bold', width: '100%' }}
+                    >
+                        Save Board
+                    </Button>
+                </BoardUtilsItem>
             </List>
         </BoardContainerPage>
     )
