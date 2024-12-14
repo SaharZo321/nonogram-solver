@@ -7,8 +7,22 @@ This project is a remake of my highschool project written in Typescript, React.
 
 The app lets you draw and customize your own board with some utilities:
 
+
+- Manipulating board size to your choice.
+
+<img src="./public/videos/size.gif" width=400/> 
+<br/>
+
 - Rotating the board 90 degrees either side.
 - Flipping the board horizontally and vertically.
+
+<img src="./public/videos/creation.gif" width=400/>
+<br/>
+
+- Creating random boards with optional black percentage slider.
+
+<img src="./public/videos/random.gif" width=400/>
+<br/>
 
 The app makes its own constraints while customizing your board.
 
@@ -25,25 +39,18 @@ This is my first modification:
 
 Instead of starting to solve immediately and checking each tile of the board,
 the algorithm creates a multi-dimensional array which contains all of the possible solutions for every row.
-
-Yes - each row has more than 1 solution.
+Each row may have more than 1 solution by itself.
 
 The solutions are created by using only the rows constraints.
-
-This first step can be sped up using multi-threaded workload.
 
 ### Second step - going through all the possible solutions to complete a board
 
 Now, all left to do is just go through all the row solutions created to complete a board by checking the column constraints.
 
-The algorithm adds recursively a row solution to the board each success it has, until the board is complete.
+The algorithm used is Back-tracking. Every step adds a new row solution to the board. If successfully, adds another, otherwise it will back-track to the old board, until the board is complete.
 
-### There might be more than 1 solution though?
+<img src="./public/videos/solve.gif" width=400/>
 
-Well, if you thought so you are right!
-
-I managed to create an algorithm which also gets an array of all the solutions possible, but I left it out of the project 
-since it is a bit heavy...
 
 ### How are the steps saved?
 
@@ -54,10 +61,8 @@ However, this got me to some trouble - **THERE WERE SO MANY STEPS**
 
 With a large board, a solution can have more than **10,000,000 steps**, which cost me more memory than I have on my computer!
 
-I had to manage the snapshot to use the lowest amount of memory. Then, I found the perfect solution - **BIT ARRAYS**
+I had to manage the snapshot to use the lowest amount of memory. Then, I found the **BIT ARRAYS** as a solution.
 
-Because Nonogram boards have only 2 colors, a bit array is the perfect data structure to save the grid.
+Because Nonogram boards have only 2 colors, a bit array is the perfect data structure to save a snapshot of the grid.
 
 This exteremely reduced the amount of memory used to solve the large boards.
-
-### Enjoy! 😁
