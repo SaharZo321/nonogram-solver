@@ -2,7 +2,7 @@ import { Box, Dialog, Paper, Typography } from "@mui/material";
 
 export default function HomePage() {
     return (
-        <Box sx={{ pt: '64px'}}>
+        <Box sx={{ pt: '64px', width: '100vw', display: 'flex', justifyContent: 'space-around'}}>
             <Typography variant='h1'>
                 Home
             </Typography>

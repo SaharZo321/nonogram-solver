@@ -1,6 +1,6 @@
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { Box, Button, Dialog, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 type LoginDialogProps = {
     open: boolean,
@@ -9,8 +9,6 @@ type LoginDialogProps = {
 }
 
 const usernameRegex = /^[\w\d_]{3,16}$/
-
-const passwordRegex = /^(?=.*[\d])(?=.*[!@#$%^&*])[\w!@#$%^&*]{6,16}$/
 
 export default function LoginDialog(props: LoginDialogProps) {
 
@@ -38,8 +36,8 @@ export default function LoginDialog(props: LoginDialogProps) {
         }
     }, [props.open])
 
-    const isPasswordOk = useCallback(() => Boolean(credentials.password.match(passwordRegex)), [credentials.password])
-    const isUsernameOk = useCallback(() => Boolean(credentials.username.match(usernameRegex)), [credentials.username])
+    const isPasswordOk = useMemo(() => credentials.password.length !== 0, [credentials.password])
+    const isUsernameOk = useMemo(() => Boolean(credentials.username.match(usernameRegex)), [credentials.username])
 
     return (
         <Dialog
@@ -51,7 +49,7 @@ export default function LoginDialog(props: LoginDialogProps) {
                     <FormControl
                         sx={{ m: 1, width: '25ch' }}
                         required
-                        error={!isUsernameOk()}
+                        error={!isUsernameOk}
                     >
                         <InputLabel>Username</InputLabel>
                         <OutlinedInput
@@ -64,7 +62,7 @@ export default function LoginDialog(props: LoginDialogProps) {
                     <FormControl
                         sx={{ m: 1, width: '25ch' }}
                         required
-                        error={!isPasswordOk()}
+                        error={!isPasswordOk}
                     >
                         <InputLabel>Password</InputLabel>
                         <OutlinedInput
@@ -90,7 +88,7 @@ export default function LoginDialog(props: LoginDialogProps) {
                     <Button
                         variant="contained"
                         sx={{ m: 1, width: '10ch' }}
-                        disabled={!isPasswordOk() || !isUsernameOk()}
+                        disabled={!isPasswordOk || !isUsernameOk}
                         onClick={() => props.onLogin(credentials.username)}
                     >
                         Login
