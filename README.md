@@ -8,7 +8,7 @@ This project is a remake of my highschool project written in Typescript, React.
 The app lets you draw and customize your own board with some utilities:
 
 - Rotating the board 90 degrees either side.
-- Mirroring the board horizontally and vertically.
+- Flipping the board horizontally and vertically.
 
 The app makes its own constraints while customizing your board.
 
