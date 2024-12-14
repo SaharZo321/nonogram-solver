@@ -185,12 +185,7 @@ export default function BoardCreation() {
                         SHOW ME THE SOLUTION
                     </Button>
                 </BoardUtilsItem>
-                <BoardUtilsItem>
-                    <Button variant="contained" size='large' sx={{ fontWeight: 'bold', width: '100%' }}
-                    >
-                        Save Board
-                    </Button>
-                </BoardUtilsItem>
+                
             </List>
         </BoardContainerPage>
     )

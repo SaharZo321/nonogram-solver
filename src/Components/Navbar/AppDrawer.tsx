@@ -47,16 +47,7 @@ export default function AppDrawer(props: AppDrawerProps) {
             }}>
                 <List>
                     <ListItem sx={{ justifyContent: 'center' }}>
-                        <FormGroup>
-                            <FormControlLabel control={
-                                <Switch
-                                    checked={settingsState.shit}
-                                    onChange={(_, checked) => {
-                                        settingsDispatcher({ type: 'change-shit', payload: checked })
-                                    }}
-                                />
-                            } label="Dark Mode" />
-                        </FormGroup>
+                        
                     </ListItem>
                 </List>
             </Box>
