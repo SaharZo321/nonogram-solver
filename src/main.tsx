@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 import { Navigate, RouterProvider, createHashRouter } from 'react-router-dom'
-import ErrorPage from 'Components/Routes/ErrorPage/ErrorPage.tsx'
-import HomePage from 'Components/Routes/HomePage/HomePage.tsx'
-import BoardCreation from 'Components/Routes/AISolver/BoardCreation/BoardCreation.tsx'
-import BoardSolutions from 'Components/Routes/AISolver/BoardSolutions/BoardSolutions.tsx'
+import ErrorPage from '@routes/ErrorPage/ErrorPage.tsx'
+import HomePage from '@routes/HomePage/HomePage.tsx'
+import BoardCreation from '@routes/AISolver/BoardCreation/BoardCreation.tsx'
+import BoardSolutions from '@routes/AISolver/BoardSolutions/BoardSolutions.tsx'
 
 const router = createHashRouter([
 	{

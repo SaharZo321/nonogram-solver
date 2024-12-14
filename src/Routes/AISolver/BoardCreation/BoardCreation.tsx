@@ -1,13 +1,13 @@
 import { Box, Button, List, ListItem, Typography, } from "@mui/material";
 
-import Board, { BoardTile, Position } from "../../../../Board/Board";
+import Board, { BoardTile, Position } from "@board/Board";
 import { PropsWithChildren, useCallback, useReducer, useState } from "react";
 import styled from "@emotion/styled";
 import { useDebouncedCallback } from "use-debounce";
 import { Flip, RotateLeftRounded, RotateRightRounded } from "@mui/icons-material";
-import { BoardContainerPage } from "../../../Board/PageLayout";
+import { BoardContainerPage } from "@components/Board/PageLayout";
 import { useNavigate } from "react-router-dom";
-import { StyledButton, StyledSlider } from "Components/General/StyledComponents";
+import { StyledButton, StyledSlider } from "@components/General/StyledComponents";
 
 const defaultSize = 10
 const demoBoard = new Board({ size: defaultSize })

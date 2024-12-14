@@ -2,7 +2,7 @@ import { AccountCircle, Brightness4, Brightness7, ChevronLeft as ChevronLeftIcon
 import { AppBar, Box, Button, IconButton,  Menu, MenuItem, Toolbar, Typography, useTheme } from "@mui/material";
 import { MouseEvent, PropsWithChildren, useCallback, useContext, useState } from "react";
 import AppDrawer from "./AppDrawer";
-import { ColorModeContext, SettingsContext } from "../../App";
+import { ColorModeContext, SettingsContext } from "@renderer/App";
 import { Link, useMatch } from "react-router-dom";
 import styled from "@emotion/styled";
 import LoginDialog from "./LoginDialog";

@@ -1,5 +1,5 @@
 import { createContext, useEffect, useMemo, useState } from "react";
-import Navbar from "./Components/Navbar/Navbar"
+import Navbar from "@components/Navbar/Navbar"
 import { CssBaseline, PaletteMode, ThemeProvider, createTheme } from "@mui/material";
 import { Outlet } from "react-router-dom";
 

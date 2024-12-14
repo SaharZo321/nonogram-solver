@@ -13,6 +13,7 @@ dist-ssr
 dist-electron
 release
 *.local
+NonoSolver-win32-x64
 
 # Editor directories and files
 .vscode/*
@@ -24,3 +25,5 @@ release
 *.njsproj
 *.sln
 *.sw?
+
+out/

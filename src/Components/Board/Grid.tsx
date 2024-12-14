@@ -1,7 +1,7 @@
 import { memo, useContext, useMemo, useRef } from "react";
 import { Tile } from "./Tile";
 import { Box, SxProps, styled } from "@mui/material";
-import { BoardGrid } from "../../Board/Board";
+import { BoardGrid } from "@board/Board";
 
 
 

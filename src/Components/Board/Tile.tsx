@@ -1,6 +1,6 @@
 import { Box, ButtonBase, Icon, SxProps, useTheme } from "@mui/material"
 import { memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
-import { ColorModeContext, SettingsContext } from "../../App"
+import { ColorModeContext, SettingsContext } from "@renderer/App"
 import { BoardTile } from "../../Board/Board"
 import { CloseRounded } from "@mui/icons-material"
 import styled from "@emotion/styled"

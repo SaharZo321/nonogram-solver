@@ -1,5 +1,5 @@
-import Board, { LineConstraint, BoardTile } from "Board/Board";
-import { GridBitArray } from "Board/GridBitArray";
+import Board, { LineConstraint, BoardTile } from "@board/Board";
+import { GridBitArray } from "@board/GridBitArray";
 
 self.onmessage = (event) => {
     const boardReference = new Board(event.data)

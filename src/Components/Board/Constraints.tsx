@@ -1,5 +1,5 @@
 import { Box, SxProps, Typography, styled } from "@mui/material"
-import { BoardConstraints } from "../../Board/Board"
+import { BoardConstraints } from "@board/Board"
 import { memo } from "react"
 
 type RowConstraintsProps = {

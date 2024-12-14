@@ -1,6 +1,6 @@
 import { Box, Drawer, FormControlLabel, FormGroup, List, ListItem, Switch } from "@mui/material";
 import { useContext, useReducer } from "react";
-import { ColorModeContext } from "../../App";
+import { ColorModeContext } from "@renderer/App";
 
 type AppDrawerProps = {
     open: boolean,

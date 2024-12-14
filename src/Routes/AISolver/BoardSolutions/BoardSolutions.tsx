@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import { BoardContainerPage } from "Components/Board/PageLayout";
+import { BoardContainerPage } from "@components/Board/PageLayout";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Box, Button, CircularProgress, IconButton, useTheme } from "@mui/material";
-import Board from "Board/Board";
+import Board from "@board/Board";
 import { NavigateBefore, NavigateNext, Pause, PlayArrow } from "@mui/icons-material";
-import { GridBitArray } from "Board/GridBitArray";
-import { StyledSlider } from "Components/General/StyledComponents";
+import { GridBitArray } from "@board/GridBitArray";
+import { StyledSlider } from "@components/General/StyledComponents";
 import { Solution } from "./SolverWorker";
 
 
