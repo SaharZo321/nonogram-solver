@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { BoardContainerPage } from "@components/Board/PageLayout";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Box, Button, CircularProgress, IconButton, useTheme } from "@mui/material";
+import { Box, Button, CircularProgress, IconButton, LinearProgress, useTheme } from "@mui/material";
 import Board from "@board/Board";
 import { NavigateBefore, NavigateNext, Pause, PlayArrow } from "@mui/icons-material";
 import { GridBitArray } from "@board/GridBitArray";
@@ -18,9 +18,12 @@ export default function BoardSolutions() {
     const [position, setPosition] = useState(0)
     const [playingState, setPlayingState] = useState({ isPlaying: false, mode: false })
     const [animationParams, setAnimationParams] = useState({ step: 1, interval: 100 })
+    const [rowIndexState, setRowIndexState] = useState(0)
     const navigate = useNavigate()
 
-
+    useEffect(() => {
+        console.log(rowIndexState)
+    }, [rowIndexState])
 
     useEffect(() => {
         if (!location.state) {
@@ -31,15 +34,18 @@ export default function BoardSolutions() {
             const solverWorker = new Worker(new URL("./SolverWorker.ts", import.meta.url), { type: "module" })
 
             solverWorker.onmessage = (event) => {
-                const solution: Solution = event.data;
-                console.log(solution)
-                const grid = GridBitArray.getGrid(location.state.size, solution.steps[0])
-                setShownBoard(new Board({ ...location.state, grid }))
-                setSteps(solution.steps)
-                const step = 1
-                const interval = Math.min(Math.max(Math.ceil(30000 / solution.steps.length), 5), 800)
-                setAnimationParams({ step, interval })
-                console.log(solution.steps.length)
+                if (event.data.rowIndex !== undefined) {
+                    setRowIndexState(event.data.rowIndex)
+                } else {
+                    const solution: Solution = event.data;
+                    const grid = GridBitArray.getGrid(location.state.size, solution.steps[0])
+                    setShownBoard(new Board({ ...location.state, grid }))
+                    setSteps(solution.steps)
+                    const step = 1
+                    const interval = Math.min(Math.max(Math.ceil(30000 / solution.steps.length), 5), 800)
+                    setAnimationParams({ step, interval })
+                    console.log(solution.steps.length)
+                }
             }
             const timeout = setTimeout(() => solverWorker.postMessage(location.state), 500)
 
@@ -89,20 +95,18 @@ export default function BoardSolutions() {
                     >
                         <NavigateBefore fontSize="large" />
                     </IconButton>
-                    {steps.length !== 0 ?
-                        <IconButton
-                            size="large"
-                            color='primary'
-                            onClick={() => setPlayingState(prev => ({ isPlaying: !prev.isPlaying, mode: !prev.isPlaying }))}
-                        >
-                            {
-                                playingState.isPlaying ?
-                                    <Pause fontSize="large" /> :
-                                    <PlayArrow fontSize="large" />
-                            }
-                        </IconButton> :
-                        <CircularProgress size={35} sx={{ marginY: "auto" }} />
-                    }
+                    <IconButton
+                        size="large"
+                        color='primary'
+                        onClick={() => setPlayingState(prev => ({ isPlaying: !prev.isPlaying, mode: !prev.isPlaying }))}
+                        disabled={steps.length === 0}
+                    >
+                        {
+                            playingState.isPlaying ?
+                                <Pause fontSize="large" /> :
+                                <PlayArrow fontSize="large" />
+                        }
+                    </IconButton>
                     <IconButton
                         size="large"
                         color='primary'
@@ -125,9 +129,14 @@ export default function BoardSolutions() {
                 <Button variant="contained" size='large' onClick={() => navigate('/ai-solver/board-creation')} sx={{ fontWeight: 'bold' }}>
                     Create Another Board
                 </Button>
-                <Box display='flex' justifyContent='space-around'>
 
+                <Box width="80%" mx="10%" height="4px">
+                    {
+                        steps.length === 0 &&
+                        <LinearProgress variant="determinate" value={(rowIndexState + 1) / shownBoard.size * 100} />
+                    }
                 </Box>
+
             </Box>
         </BoardContainerPage > :
         <></>

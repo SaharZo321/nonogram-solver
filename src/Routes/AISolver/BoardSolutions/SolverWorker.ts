@@ -27,7 +27,7 @@ function Solver(boardReference: Board): Solution {
             return board
         }
         const thisRowsSolutions = allRowsSolutions[rowIndex];
-
+        self.postMessage({ rowIndex })
         for (let i = 0; i < thisRowsSolutions.length; i++) {
             board.setRow(rowIndex, thisRowsSolutions[i]);
             const gridSnapshot = GridBitArray.convertBoardFast(board)
