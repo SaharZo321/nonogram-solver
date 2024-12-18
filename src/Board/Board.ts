@@ -106,7 +106,7 @@ export default class Board {
         return this
     }
 
-    #generateConstraints() {
+    private generateConstraints() {
         let count = 0;
         this.constraints.columns = [];
         for (let c = 0; c < this.size; c++) {
@@ -148,19 +148,19 @@ export default class Board {
                 return Math.random() <= markChance ? BoardTile.Marked : BoardTile.Unmarked
             })
         })
-        return this.#generateConstraints()
+        return this.generateConstraints()
     }
 
     flipVertically() {
         this.grid = this.gridClone.map((_, rowIndex) => {
             return this.grid[this.size - 1 - rowIndex];
         })
-        return this.#generateConstraints()
+        return this.generateConstraints()
     }
 
     flipHorizontally() {
         this.grid = this.gridClone.map((row) => row.reverse())
-        return this.#generateConstraints()
+        return this.generateConstraints()
     }
 
     rotateClockwise() {

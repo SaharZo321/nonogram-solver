@@ -29,14 +29,15 @@ function Solver(boardReference: Board): Solution {
         const thisRowsSolutions = allRowsSolutions[rowIndex];
 
         for (let i = 0; i < thisRowsSolutions.length; i++) {
-            const newBoard = board.clone.setRow(rowIndex, thisRowsSolutions[i]);
-            const gridSnapshot = GridBitArray.convertBoardFast(newBoard)
+            board.setRow(rowIndex, thisRowsSolutions[i]);
+            const gridSnapshot = GridBitArray.convertBoardFast(board)
             steps.push(gridSnapshot)
-            if (!isRowValid(newBoard, rowIndex)) { continue; }
-            const solution = Solve(newBoard, rowIndex + 1)
+            if (!isRowValid(board, rowIndex)) { continue; }
+            const solution = Solve(board, rowIndex + 1)
             if (!solution) { continue; }
             return solution;
         }
+        board.emptyRow(rowIndex);
         return undefined;
     }
     const solution = Solve(boardReference.emptyGrid())
