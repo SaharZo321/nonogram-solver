@@ -1,21 +1,29 @@
 import { app, BrowserWindow } from 'electron'
 import path from 'path'
 import { ipcMainHandle, ipcMainOn, isDev } from './util.js'
-import { getPreloadPath } from './pathResolver.js'
+import { getPreloadPath, getUIPath } from './pathResolver.js'
+import setMenu from './menu.js'
+
+const minWindowSize = {
+    width: 900,
+    height: 600,
+}
 
 app.on('ready', () => {
     const mainWindow = new BrowserWindow({
         webPreferences: {
             preload: getPreloadPath()
         },
-        minHeight: 600,
-        minWidth: 900,
+        minHeight: minWindowSize.height,
+        minWidth: minWindowSize.width,
         frame: false,
     })
+    mainWindow.setSize(minWindowSize.width, minWindowSize.height)
+    setMenu(mainWindow)
     if (isDev()) {
         mainWindow.loadURL("http://localhost:5173")
     } else {
-        mainWindow.loadFile(path.join(app.getAppPath(), '/dist-react/index.html'))
+        mainWindow.loadFile(getUIPath())
     }
     ipcMainHandle("isDev", isDev)
     ipcMainOn("sendFrameAction", payload => {
