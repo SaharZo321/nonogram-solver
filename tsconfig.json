@@ -2,10 +2,16 @@
   "compilerOptions": {
     "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "module": "ESNext",
     "skipLibCheck": true,
-
+    "types": [
+      "./types"
+    ],
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -13,19 +19,35 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@components/*": [ "./src/Components/*"],
-      "@board/*": [ "./src/Board/*"],
-      "@routes/*": [ "./src/Routes/*"],
-      "@renderer/*": [ "./src/*"],
+      "@components/*": [
+        "./src/ui/components/*"
+      ],
+      "@routes/*": [
+        "./src/ui/routes/*"
+      ],
+      "@board-utils/*": [
+        "./src/ui/board-utils/*"
+      ],
+      "@renderer/*": [
+        "./src/ui/*"
+      ],
     }
   },
-  "include": ["src", "electron"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "src/electron"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }

@@ -9,11 +9,9 @@ lerna-debug.log*
 
 node_modules
 dist
-dist-ssr
+dist-react
 dist-electron
-release
 *.local
-NonoSolver-win32-x64
 
 # Editor directories and files
 .vscode/*
@@ -25,5 +23,3 @@ NonoSolver-win32-x64
 *.njsproj
 *.sln
 *.sw?
-
-out/
