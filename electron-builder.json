@@ -1,7 +1,7 @@
 {
     "appId": "com.s-zolberg.nonogram-solver",
-    "files": ["dist-electron", "dist-react"],
-    "extraResources": ["dist-electron/preload.cjs", "./src/assets**"],
+    "files": ["dist-electron", "dist-react", "src/assets/**"],
+    "extraResources": ["dist-electron/preload.cjs"],
     "icon": "./public/icon.png",
     "mac": {
         "target": "dmg"
