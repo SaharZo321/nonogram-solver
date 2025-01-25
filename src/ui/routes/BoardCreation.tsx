@@ -1,7 +1,7 @@
 import { Box, Button, List, ListItem, Typography, } from "@mui/material";
 
 import Board from "@board-utils/board";
-import { PropsWithChildren, useCallback, useContext, useEffect, useReducer, useState } from "react";
+import { PropsWithChildren, useCallback, useContext, useReducer, useState } from "react";
 import styled from "@emotion/styled";
 import { useDebouncedCallback } from "use-debounce";
 import { Flip, RotateLeftRounded, RotateRightRounded } from "@mui/icons-material";
