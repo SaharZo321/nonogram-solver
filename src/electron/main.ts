@@ -1,5 +1,5 @@
 import { app, BrowserWindow, ipcMain, Menu, nativeTheme } from 'electron'
-import { ipcMainHandle, ipcMainOn, ipcWebContentsSend, isDev } from './util.js'
+import { ipcMainHandle, ipcMainOn, ipcWebContentsSend, isDev, isMacOs } from './util.js'
 import { getPreloadPath, getUIPath } from './pathResolver.js'
 
 const minWindowSize = {
@@ -21,6 +21,22 @@ function menuTemplate(mainWindow: BrowserWindow) {
                     click: () => mainWindow.webContents.openDevTools(),
                     visible: isDev()
                 }
+            ]
+        }, {
+            label: "Theme",
+            submenu: [
+                {
+                    label: "System",
+                    click: () => nativeTheme.themeSource = "system"
+                },
+                {
+                    label: "Light",
+                    click: () => nativeTheme.themeSource = "light"
+                },
+                {
+                    label: "Dark",
+                    click: () => nativeTheme.themeSource = "dark"
+                },
             ]
         }
     ])
@@ -49,6 +65,7 @@ function createWindow() {
         mainWindow.loadFile(getUIPath())
     }
     ipcMainHandle("isDev", isDev)
+    ipcMainHandle("isMacOs", isMacOs)
     ipcMainOn("sendFrameAction", payload => {
         switch (payload) {
             case 'QUIT':
@@ -76,8 +93,9 @@ function createWindow() {
 
     ipcMainHandle("getSystemTheme", () => nativeTheme.shouldUseDarkColors ? "dark" : "light")
 
-
-    mainWindow.setMenu(menuTemplate(mainWindow))
+    if (isMacOs()) {
+        mainWindow.setMenu(menuTemplate(mainWindow))
+    }
 }
 
 

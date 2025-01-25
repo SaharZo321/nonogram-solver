@@ -1,6 +1,7 @@
 interface Window {
     electron: {
         isDev: () => Promise<boolean>
+        isMacOs: () => Promise<boolean>
         sendFrameAction: (payload: EventPayloadMapping["sendFrameAction"]) => void
         subscribeThemeChange: (callback: (payload: EventPayloadMapping["subscribeThemeChange"]) => void) => UnsubscribeFunction
         getSystemTheme: () => Promise<EventPayloadMapping["getSystemTheme"]>
@@ -18,7 +19,7 @@ type EventPayloadMapping = {
     subscribeThemeChange: "dark" | "light",
     setTitleBarOverlay: TitleBarOverlayOptions
     getSystemTheme: "dark" | "light",
-
+    isMacOs: boolean
 }
 
 type TitleBarOverlayOptions = {

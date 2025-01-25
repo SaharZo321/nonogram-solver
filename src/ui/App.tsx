@@ -1,5 +1,4 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from "react";
-import Navbar from "@components/Navbar/Navbar"
 import { CssBaseline, PaletteMode, createTheme } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import TitleBar from "@components/Navbar/TitleBar";
@@ -14,7 +13,7 @@ export type Settings = {
 
 const defaultSettings: Settings = {
     hoverColor: 'rgba(150,150,150,0.3)',
-    colorMode: "dark",
+    colorMode: "system",
 }
 
 export const SettingsContext = createContext(defaultSettings)
@@ -27,7 +26,8 @@ function App() {
     const [settings, setSettings] = useState<Settings>(defaultSettings)
     const [themeMode, setThemeMode] = useState<PaletteMode>("dark")
     const [isDev, setIsDev] = useState<boolean>(false)
-    
+    const [isMacOs, setIsMacOs] = useState<boolean>(false)
+
     const setSetting = useCallback(<Key extends keyof Settings>(key: Key, value: Settings[Key]) => {
         setSettings(prev => ({
             ...prev,
@@ -36,7 +36,10 @@ function App() {
     }, [])
 
     useEffect(() => {
-        switch(settings.colorMode) {
+        if (isMacOs) {
+            return window.electron.subscribeThemeChange(setThemeMode)
+        }
+        switch (settings.colorMode) {
             case "system": {
                 (async () => {
                     setThemeMode(await window.electron.getSystemTheme())
@@ -47,10 +50,13 @@ function App() {
                 setThemeMode(settings.colorMode)
             }
         }
-    }, [settings.colorMode])
+    }, [settings.colorMode, isMacOs])
 
     useEffect(() => {
-        (async () => setIsDev(await window.electron.isDev()))()
+        (async () => {
+            setIsDev(await window.electron.isDev())
+            setIsMacOs(await window.electron.isMacOs())
+        })()
     }, [])
 
     useEffect(() => {
@@ -81,10 +87,7 @@ function App() {
                     backgroundColor={TITLEBAR_COLOR[themeMode]}
                     setSetting={setSetting}
                 />
-                {/* <Navbar setSetting={setSetting}/> */}
-                <main>
-                    <Outlet />
-                </main>
+                <Outlet />
             </CustomThemeProvider>
         </SettingsContext.Provider>
     )

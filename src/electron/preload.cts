@@ -2,6 +2,7 @@ import electron, { app, IpcRendererEvent, Menu } from "electron"
 
 electron.contextBridge.exposeInMainWorld("electron", {
     isDev: () => ipcInvoke("isDev"),
+    isMacOs: () => ipcInvoke("isMacOs"),
     sendFrameAction: payload => ipcSend("sendFrameAction", payload),
     subscribeThemeChange: callback => ipcOn("subscribeThemeChange", callback),
     setTitleBarOverlay: payload => ipcSend("setTitleBarOverlay", payload),

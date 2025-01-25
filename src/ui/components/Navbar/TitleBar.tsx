@@ -1,6 +1,6 @@
-import { Box, ClickAwayListener, MenuItem, MenuList, Paper, Popper, PopperProps, styled } from "@mui/material"
+import { Box, ClickAwayListener, MenuItem, MenuList, Paper, Popper, styled } from "@mui/material"
 import { Settings, SettingsContext } from "@renderer/App"
-import { useCallback, useContext, useRef, useState } from "react"
+import { PropsWithChildren, useCallback, useContext, useRef, useState } from "react"
 
 
 
@@ -9,6 +9,7 @@ type TitleBarProps = {
     onQuit?: () => void
     onOpenDevTools?: () => void
     isDev?: boolean,
+    isMacOs?: boolean,
     backgroundColor: string
     setSetting?: <Key extends keyof Settings>(key: Key, value: Settings[Key]) => void
 }
@@ -46,53 +47,67 @@ function MainTitleBar(props: TitleBarProps) {
                 borderBottom: `1px ${BORDER_COLOR} solid`,
                 backgroundColor: props.backgroundColor,
                 ...draggable(true),
-                zIndex: 1,
                 boxSizing: "content-box"
             }}
         >
-            <Box justifySelf="end" mr="auto" sx={draggable(false)} display="flex">
-                <img src={`${props.isDev ? "." : ".."}/src/assets/icon.png`} width="auto" height="auto" style={{ padding: "6px" }} />
-                <AppMenu
-                    onAppQuit={props.onQuit}
-                    onOpenDevTools={props.onOpenDevTools}
-                    isDev={props.isDev}
-                />
-                <ThemeMenu
-                    theme={settings.colorMode}
-                    setTheme={theme => props.setSetting?.("colorMode", theme)}
-                />
-            </Box>
+            {
+                !props.isMacOs && (
+                    <Box justifySelf="end" mr="auto" sx={draggable(false)} display="flex">
+                        <img src={`${props.isDev ? "." : ".."}/src/assets/icon.png`} width="auto" height="auto" style={{ padding: "6px" }} />
+                        <AppMenu
+                            onAppQuit={props.onQuit}
+                            onOpenDevTools={props.onOpenDevTools}
+                            isDev={props.isDev}
+                        />
+                        <ThemeMenu
+                            theme={settings.colorMode}
+                            setTheme={theme => props.setSetting?.("colorMode", theme)}
+                        />
+                    </Box>
+                )
+            }
         </Box>
     )
 }
 
 type AppMenuProps = {
-    onClose?: () => void
     isDev?: boolean
     onAppQuit?: () => void,
     onOpenDevTools?: () => void
 }
 
-function TitleBarPopper(props: PopperProps) {
+function TitleBarMenu(props: PropsWithChildren<{ onOpen: () => void, onClose: () => void, label: string, open: boolean }>) {
+    const appButtonRef = useRef(null)
+
     return (
-        <Popper
-            placement="bottom-start"
-            disablePortal={true}
-            {...props}
-        >
-            {props.children}
-        </Popper>
+        <>
+            <MenuButton
+                onClick={props.onOpen}
+                ref={appButtonRef}
+            >
+                {props.label}
+            </MenuButton>
+            <Popper
+                placement="bottom-start"
+                disablePortal={true}
+                open={props.open}
+                anchorEl={appButtonRef.current}
+            >
+                <StyledPaper>
+                    <ClickAwayListener onClickAway={props.onClose}>
+                        <MenuList>
+                            {props.children}
+                        </MenuList>
+                    </ClickAwayListener>
+
+                </StyledPaper>
+            </Popper>
+        </>
     )
 }
 
 function AppMenu(props: AppMenuProps) {
-    const appButtonRef = useRef(null)
     const [menuState, setMenuState] = useState<boolean>(false)
-
-    const handleCloseMenu = useCallback(() => {
-        props.onClose?.()
-        setMenuState(false)
-    }, [props.onClose])
 
     const handleOpenDevTools = useCallback(() => {
         props.onOpenDevTools?.()
@@ -100,96 +115,77 @@ function AppMenu(props: AppMenuProps) {
     }, [])
 
     return (
-        <>
-            <MenuButton
-                onClick={() => setMenuState(true)}
-                ref={appButtonRef}
-            >
-                App
-            </MenuButton>
-            <TitleBarPopper
-                open={menuState}
-                anchorEl={appButtonRef.current}
-            >
-                <StyledPaper>
-                    <ClickAwayListener onClickAway={handleCloseMenu}>
-                        <MenuList>
-                            <MenuItem dense onClick={props.onAppQuit}>
-                                Quit
-                            </MenuItem>
-                            {props.isDev && <MenuItem dense onClick={handleOpenDevTools}>
-                                Open DevTools
-                            </MenuItem>}
-                        </MenuList>
-                    </ClickAwayListener>
-                </StyledPaper>
-            </TitleBarPopper>
-        </>
+        <TitleBarMenu
+            label="App"
+            open={menuState}
+            onClose={() => setMenuState(false)}
+            onOpen={() => setMenuState(true)}
+        >
+            <MenuItem dense onClick={props.onAppQuit}>
+                Quit
+            </MenuItem>
+            {props.isDev && <MenuItem dense onClick={handleOpenDevTools}>
+                Open DevTools
+            </MenuItem>}
+        </TitleBarMenu>
+    )
+}
+
+type Mode = "dark" | "light" | "system"
+
+type ThemeMenuItemProps = {
+    mode: Mode
+    handleSetTheme: (mode: Mode) => void
+    chosenMode: Mode
+}
+function ThemeMenuItem(props: ThemeMenuItemProps) {
+    return (
+        <MenuItem
+            dense
+            onClick={() => props.handleSetTheme(props.mode)}
+            selected={props.chosenMode === props.mode}
+        >
+            {props.mode.charAt(0).toUpperCase() + props.mode.substring(1)}
+        </MenuItem>
     )
 }
 
 type ThemeMenuProps = {
-    onClose?: () => void,
     setTheme: (setting: "dark" | "light" | "system") => void
     theme: "dark" | "light" | "system"
 }
 
+const modes: Mode[] = ["system", "light", "dark"]
+
 function ThemeMenu(props: ThemeMenuProps) {
-    const themeButtonRef = useRef(null)
     const [menuState, setMenuState] = useState<boolean>(false)
 
-    const handleCloseMenu = useCallback(() => {
-        props.onClose?.()
-        setMenuState(false)
-    }, [props.onClose])
-
     const handleSetTheme = useCallback((theme: "dark" | "light" | "system") => {
-        handleCloseMenu()
+        setMenuState(false)
         props.setTheme(theme)
     }, [])
 
     return (
-        <>
-            <MenuButton
-                onClick={() => setMenuState(true)}
-                ref={themeButtonRef}
-            >
-                Theme
-            </MenuButton>
-            <TitleBarPopper
-                open={menuState}
-                anchorEl={themeButtonRef.current}
-            >
-                <StyledPaper>
-                    <ClickAwayListener onClickAway={handleCloseMenu}>
-                        <MenuList>
-                            <MenuItem
-                                dense
-                                onClick={() => handleSetTheme("system")}
-                                selected={props.theme === "system"}
-                            >
-                                System
-                            </MenuItem>
-                            <MenuItem
-                                dense
-                                onClick={() => handleSetTheme("dark")}
-                                selected={props.theme === "dark"}
-                            >
-                                Dark
-                            </MenuItem>
-                            <MenuItem
-                                dense
-                                onClick={() => handleSetTheme("light")}
-                                selected={props.theme === "light"}
-                            >
-                                Light
-                            </MenuItem>
-                        </MenuList>
-                    </ClickAwayListener>
-                </StyledPaper>
-            </TitleBarPopper>
-        </>
+
+        <TitleBarMenu
+            open={menuState}
+            label="Theme"
+            onClose={() => setMenuState(false)}
+            onOpen={() => setMenuState(true)}
+        >
+            {
+                modes.map((mode, index) => (
+                    <ThemeMenuItem
+                        key={index}
+                        mode={mode}
+                        chosenMode={props.theme}
+                        handleSetTheme={handleSetTheme}
+                    />
+                ))
+            }
+        </TitleBarMenu>
     )
+
 }
 
 // type 

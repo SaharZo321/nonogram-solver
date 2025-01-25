@@ -9,6 +9,7 @@ import { BoardContainerPage } from "@components/Board/PageLayout";
 import { useNavigate } from "react-router-dom";
 import { StyledButton, StyledSlider } from "@components/General/StyledComponents";
 import { SettingsContext } from "@renderer/App";
+import { Mark } from "@mui/material/Slider/useSlider.types";
 
 const defaultSize = 10
 const demoBoard = new Board({ size: defaultSize })
@@ -263,15 +264,9 @@ const StyledListItem = styled(ListItem)`
     align-items: center;
     width: 300px;
     padding: 20px 0;
-
-    @media (max-width: 1000px) and (orientation:portrait) {
-        & {
-            padding: 12px 0;
-        }
-    }
 `
 
-const marks = [
+const marks: Mark[] = [
     {
         value: 5,
         label: '5x5',
