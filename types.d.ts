@@ -2,12 +2,29 @@ interface Window {
     electron: {
         isDev: () => Promise<boolean>
         sendFrameAction: (payload: EventPayloadMapping["sendFrameAction"]) => void
+        subscribeThemeChange: (callback: (payload: EventPayloadMapping["subscribeThemeChange"]) => void) => UnsubscribeFunction
+        getSystemTheme: () => Promise<EventPayloadMapping["getSystemTheme"]>
+        setTitleBarOverlay: (payload: EventPayloadMapping["setTitleBarOverlay"]) => void
     }
 }
+
+type UnsubscribeFunction = () => void
+
+
 
 type EventPayloadMapping = {
     isDev: boolean,
     sendFrameAction: "QUIT" | "MAXIMIZE" | "MINIMIZE" | "OPEN_DEVTOOLS",
+    subscribeThemeChange: "dark" | "light",
+    setTitleBarOverlay: TitleBarOverlayOptions
+    getSystemTheme: "dark" | "light",
+
+}
+
+type TitleBarOverlayOptions = {
+    color?: string,
+    symbolColor?: string,
+    height?: number
 }
 
 type GridBitArray = number[]

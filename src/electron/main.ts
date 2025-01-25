@@ -1,25 +1,48 @@
-import { app, BrowserWindow } from 'electron'
-import path from 'path'
-import { ipcMainHandle, ipcMainOn, isDev } from './util.js'
+import { app, BrowserWindow, ipcMain, Menu, nativeTheme } from 'electron'
+import { ipcMainHandle, ipcMainOn, ipcWebContentsSend, isDev } from './util.js'
 import { getPreloadPath, getUIPath } from './pathResolver.js'
-import setMenu from './menu.js'
 
 const minWindowSize = {
     width: 900,
     height: 600,
 }
 
-app.on('ready', () => {
+function menuTemplate(mainWindow: BrowserWindow) {
+    return Menu.buildFromTemplate([
+        {
+            label: "App",
+            submenu: [
+                {
+                    label: "Quit",
+                    click: app.quit
+                },
+                {
+                    label: "Open DevTools",
+                    click: () => mainWindow.webContents.openDevTools(),
+                    visible: isDev()
+                }
+            ]
+        }
+    ])
+}
+
+function createWindow() {
+
     const mainWindow = new BrowserWindow({
-        webPreferences: {
-            preload: getPreloadPath()
-        },
         minHeight: minWindowSize.height,
         minWidth: minWindowSize.width,
-        frame: false,
+        height: minWindowSize.height,
+        width: minWindowSize.width,
+        titleBarStyle: "hidden",
+        titleBarOverlay: {
+            color: "#FFF",
+            height: 36,
+        },
+        webPreferences: {
+            preload: getPreloadPath(),
+            sandbox: false,
+        },
     })
-    mainWindow.setSize(minWindowSize.width, minWindowSize.height)
-    setMenu(mainWindow)
     if (isDev()) {
         mainWindow.loadURL("http://localhost:5173")
     } else {
@@ -27,12 +50,12 @@ app.on('ready', () => {
     }
     ipcMainHandle("isDev", isDev)
     ipcMainOn("sendFrameAction", payload => {
-        switch(payload) {
+        switch (payload) {
             case 'QUIT':
                 app.quit()
                 break
             case 'MAXIMIZE':
-                mainWindow.maximize()
+                !mainWindow.isMaximized() ? mainWindow.maximize() : mainWindow.unmaximize()
                 break
             case 'MINIMIZE':
                 mainWindow.minimize()
@@ -40,7 +63,24 @@ app.on('ready', () => {
             case 'OPEN_DEVTOOLS':
                 mainWindow.webContents.openDevTools()
                 break
-                
+
         }
     })
+    nativeTheme.addListener("updated", () => {
+        ipcWebContentsSend("subscribeThemeChange", mainWindow.webContents, nativeTheme.shouldUseDarkColors ? "dark" : "light")
+    })
+
+    ipcMainOn("setTitleBarOverlay", payload => {
+        mainWindow.setTitleBarOverlay(payload)
+    })
+
+    ipcMainHandle("getSystemTheme", () => nativeTheme.shouldUseDarkColors ? "dark" : "light")
+
+
+    mainWindow.setMenu(menuTemplate(mainWindow))
+}
+
+
+app.whenReady().then(() => {
+    createWindow()
 })

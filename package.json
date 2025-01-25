@@ -3,7 +3,10 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "author": { "name": "Sahar Zolberg", "email": "saharz321@gmail.com"},
+  "author": {
+    "name": "Sahar Zolberg",
+    "email": "saharz321@gmail.com"
+  },
   "main": "dist-electron/main.js",
   "scripts": {
     "dev": "npm-run-all --parallel dev:react dev:electron",
@@ -22,6 +25,7 @@
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.1",
     "@mui/material": "^6.4.1",
+    "custom-electron-titlebar": "^4.2.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^7.1.3",

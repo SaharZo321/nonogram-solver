@@ -5,8 +5,8 @@ export function getPreloadPath() {
     return path.join(app.getAppPath(), "/dist-electron/preload.cjs")
 }
 
-export function getAssetPath() {
-    return path.join(app.getAppPath(), "/src/assets**")
+export function getAssetPath(...paths: string[]) {
+    return path.join(app.getAppPath(), "/src/assets**", ...paths)
 }
 
 export function getUIPath() {

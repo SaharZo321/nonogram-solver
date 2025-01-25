@@ -1,10 +1,11 @@
-import { IpcRendererEvent } from "electron"
-
-const electron = require("electron")
+import electron, { app, IpcRendererEvent, Menu } from "electron"
 
 electron.contextBridge.exposeInMainWorld("electron", {
     isDev: () => ipcInvoke("isDev"),
-    sendFrameAction: (payload: EventPayloadMapping["sendFrameAction"]) => ipcSend("sendFrameAction", payload),
+    sendFrameAction: payload => ipcSend("sendFrameAction", payload),
+    subscribeThemeChange: callback => ipcOn("subscribeThemeChange", callback),
+    setTitleBarOverlay: payload => ipcSend("setTitleBarOverlay", payload),
+    getSystemTheme: () => ipcInvoke("getSystemTheme")
 } satisfies Window["electron"])
 
 function ipcInvoke<Key extends keyof EventPayloadMapping>(
@@ -28,3 +29,4 @@ function ipcSend<Key extends keyof EventPayloadMapping>(
 ) {
     electron.ipcRenderer.send(key, payload)
 }
+

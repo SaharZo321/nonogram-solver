@@ -2,27 +2,32 @@ import { createContext, useCallback, useEffect, useMemo, useState } from "react"
 import Navbar from "@components/Navbar/Navbar"
 import { CssBaseline, PaletteMode, createTheme } from "@mui/material";
 import { Outlet } from "react-router-dom";
-import Header from "@components/Navbar/Header";
+import TitleBar from "@components/Navbar/TitleBar";
 import CustomThemeProvider from "./providers/CustomThemeProvider";
 
 
 
 export type Settings = {
     hoverColor: string,
-    colorMode: PaletteMode,
+    colorMode: PaletteMode | "system",
 }
 
-const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
 const defaultSettings: Settings = {
     hoverColor: 'rgba(150,150,150,0.3)',
-    colorMode: isDarkMode ? "dark" : "light"
+    colorMode: "dark",
 }
 
 export const SettingsContext = createContext(defaultSettings)
+const TITLEBAR_COLOR = {
+    dark: "#1c1c1c",
+    light: "#f0f0f0",
+}
 
 function App() {
     const [settings, setSettings] = useState<Settings>(defaultSettings)
+    const [themeMode, setThemeMode] = useState<PaletteMode>("dark")
     const [isDev, setIsDev] = useState<boolean>(false)
+    
     const setSetting = useCallback(<Key extends keyof Settings>(key: Key, value: Settings[Key]) => {
         setSettings(prev => ({
             ...prev,
@@ -31,29 +36,50 @@ function App() {
     }, [])
 
     useEffect(() => {
+        switch(settings.colorMode) {
+            case "system": {
+                (async () => {
+                    setThemeMode(await window.electron.getSystemTheme())
+                })()
+                return window.electron.subscribeThemeChange(setThemeMode)
+            }
+            default: {
+                setThemeMode(settings.colorMode)
+            }
+        }
+    }, [settings.colorMode])
+
+    useEffect(() => {
         (async () => setIsDev(await window.electron.isDev()))()
     }, [])
+
+    useEffect(() => {
+        window.electron.setTitleBarOverlay({
+            color: TITLEBAR_COLOR[themeMode],
+            symbolColor: TITLEBAR_COLOR[themeMode === "dark" ? "light" : "dark"]
+        })
+    }, [themeMode])
 
     const theme = useMemo(
         () =>
             createTheme({
                 palette: {
-                    mode: settings.colorMode,
+                    mode: themeMode,
                 },
             }),
-        [settings.colorMode],
+        [themeMode],
     );
 
     return (
         <SettingsContext.Provider value={settings}>
             <CustomThemeProvider theme={theme}>
                 <CssBaseline />
-                <Header
+                <TitleBar
                     isDev={isDev}
                     onQuit={() => window.electron.sendFrameAction("QUIT")}
-                    onMaximize={() => window.electron.sendFrameAction("MAXIMIZE")}
-                    onMinimize={() => window.electron.sendFrameAction("MINIMIZE")}
                     onOpenDevTools={() => window.electron.sendFrameAction("OPEN_DEVTOOLS")}
+                    backgroundColor={TITLEBAR_COLOR[themeMode]}
+                    setSetting={setSetting}
                 />
                 {/* <Navbar setSetting={setSetting}/> */}
                 <main>
