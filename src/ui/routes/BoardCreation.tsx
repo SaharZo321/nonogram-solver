@@ -1,7 +1,7 @@
-import { Box, Button, List, ListItem, Typography, } from "@mui/material";
+import { Box, Button, List, ListItem, SliderProps, Typography, } from "@mui/material";
 
 import Board from "@board-utils/board";
-import { PropsWithChildren, useCallback, useContext, useReducer, useState } from "react";
+import { PropsWithChildren, useCallback, useContext, useEffect, useReducer, useState } from "react";
 import styled from "@emotion/styled";
 import { useDebouncedCallback } from "use-debounce";
 import { Flip, RotateLeftRounded, RotateRightRounded } from "@mui/icons-material";
@@ -18,7 +18,7 @@ type BoardReducerActions = {
     type: 'randomize',
     markingChance?: number,
 } | {
-    type: 'clear-board',
+    type: 'reset-board',
 } | {
     type: 'change-size',
     size: number,
@@ -48,7 +48,7 @@ const boardReducer = (state: Board, action: BoardReducerActions) => {
         case "randomize":
             const clone = state.clone.randomize(action.markingChance ? action.markingChance : 0.5);
             return clone
-        case "clear-board":
+        case "reset-board":
             return new Board({ size: state.size });
         case "change-size":
             return new Board({ size: action.size ? action.size : 10 });
@@ -73,17 +73,16 @@ const boardReducer = (state: Board, action: BoardReducerActions) => {
     }
 }
 
-const defaultChance = 0.5
+const DEFAULT_CHANCE = 0.5
 export default function BoardCreation() {
-    const { hoverColor } = useContext(SettingsContext)
+    const { hoverColor, tileColor } = useContext(SettingsContext)
     const [board, dispatchBoard] = useReducer(boardReducer, demoBoard)
-    const [randomMarkingChance, setMarkingChance] = useState(defaultChance)
+    const [randomMarkingChance, setMarkingChance] = useState(DEFAULT_CHANCE)
     const navigate = useNavigate()
-    
-    const handleBoardSizeChange = useDebouncedCallback((size: number) => {
-        dispatchBoard({ type: 'change-size', size })
-    }, 100)
 
+    const handleBoardSizeChange = useDebouncedCallback<NonNullable<SliderProps["onChange"]>>((_, value) => {
+        dispatchBoard({ type: 'change-size', size: value as number })
+    }, 100)
 
     const handleMarkingChanceChange = useCallback((chance: number) => {
         setMarkingChance(chance)
@@ -105,9 +104,23 @@ export default function BoardCreation() {
         dispatchBoard({ type: 'rotate-right' })
     }, [])
 
+    const handleResetBoard = useCallback(() => {
+        dispatchBoard({ type: 'reset-board' })
+    }, [])
+
     const setTile = useCallback((position: Position, state: BoardTile) => {
         dispatchBoard({ type: 'set-tile', tile: { position, state } })
     }, [])
+
+    const handleShowSolution = useCallback(() => {
+        if (board.isGridEmpty) {
+            alert('Cannot solve an empty grid!')
+        } else {
+            navigate('/board-solutions', {
+                state: board
+            })
+        }
+    }, [board])
 
     const randomizeBoard = useCallback(() => {
         dispatchBoard({ type: 'randomize', markingChance: randomMarkingChance })
@@ -119,8 +132,9 @@ export default function BoardCreation() {
             board={board}
             interactable
             setTile={setTile}
-            mainDrawState={"marked"}
             hoverColor={hoverColor}
+            tileColor={tileColor}
+            sizeVMin={60}
         >
             <List>
                 <BoardUtilsItem text="Board Size">
@@ -132,14 +146,14 @@ export default function BoardCreation() {
                         track={false}
                         defaultValue={defaultSize}
                         valueLabelDisplay='auto'
-                        onChange={(_, value) => handleBoardSizeChange(value as number)}
+                        onChange={handleBoardSizeChange}
                     />
                 </BoardUtilsItem>
                 <BoardUtilsItem>
                     <RandomizingUtility
                         onClick={randomizeBoard}
                         onSliderChange={handleMarkingChanceChange}
-                        defaultChance={defaultChance}
+                        defaultChance={DEFAULT_CHANCE}
                     />
                 </BoardUtilsItem>
                 <BoardUtilsItem>
@@ -167,24 +181,17 @@ export default function BoardCreation() {
                 </BoardUtilsItem>
                 <BoardUtilsItem>
                     <Button variant="contained" size='large' sx={{ fontWeight: 'bold', width: '100%' }}
-                        onClick={() => {
-                            dispatchBoard({ type: 'clear-board' })
-                        }}
+                        onClick={handleResetBoard}
                     >
                         RESET BOARD
                     </Button>
                 </BoardUtilsItem>
                 <BoardUtilsItem>
-                    <Button variant="contained" size='large' sx={{ fontWeight: 'bold', width: '100%' }}
-                        onClick={() => {
-                            if (board.isGridEmpty) {
-                                alert('Cannot solve an empty grid!')
-                            } else {
-                                navigate('/board-solutions', {
-                                    state: board
-                                })
-                            }
-                        }}
+                    <Button
+                        variant="contained"
+                        size='large'
+                        sx={{ fontWeight: 'bold', width: '100%' }}
+                        onClick={handleShowSolution}
                     >
                         SHOW ME THE SOLUTION
                     </Button>

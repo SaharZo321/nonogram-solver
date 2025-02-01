@@ -1,5 +1,5 @@
 import { Box, SxProps, Typography, styled } from "@mui/material"
-import { memo } from "react"
+import { memo, useEffect } from "react"
 
 type RowConstraintsProps = {
     constraints: BoardConstraints['rows'],
@@ -12,7 +12,6 @@ const RowConstraintContainer = styled(Box)({
     justifyContent: 'flex-end',
     alignItems: 'stretch',
     flexBasis: '100%',
-    gap: '1vmin'
 })
 
 
@@ -29,30 +28,21 @@ type ConstraintProps = {
 const RowConstraint = memo((props: ConstraintProps) => {
     return (
         <RowConstraintContainer>
-            {
-                props.constraint.map((number, index) => (
-                    <Typography key={index}
-                        sx={{
-                            fontSize: props.fontSize,
-                            alignSelf: 'center'
-                        }}
-                    >
-                        {number}
-                    </Typography>
-                ))
-            }
+            <Typography fontSize={props.fontSize} alignSelf="center">
+                {props.constraint.join(" ")}
+            </Typography>
         </RowConstraintContainer >
     )
-}, ({constraint, fontSize}, {constraint: nextConstraint, fontSize: nextFontSize}) => JSON.stringify(constraint)==JSON.stringify(nextConstraint) && fontSize === nextFontSize)
+})
 
-export const RowsConstraints= memo((props: RowConstraintsProps) => {
-    const styledConstraints = props.constraints.map((constraint, index) => (
-        <RowConstraint key={index} constraint={constraint} fontSize={props.fontSize} />
-    ))
-
+export const RowsConstraints = memo((props: RowConstraintsProps) => {
     return (
         <RowConstraintsContainer sx={props.sx}>
-            {styledConstraints}
+            {
+                props.constraints.map((constraint, index) => (
+                    <RowConstraint key={index} constraint={constraint} fontSize={props.fontSize} />
+                ))
+            }
         </RowConstraintsContainer>
     )
 })
@@ -92,15 +82,16 @@ const ColumnConstraint = memo((props: ConstraintProps) => {
             }
         </ColumnConstraintContainer >
     )
-}, ({constraint, fontSize}, {constraint: nextConstraint, fontSize: nextFontSize}) => JSON.stringify(constraint) === JSON.stringify(nextConstraint) && fontSize === nextFontSize)
+})
 
 export const ColumnConstraints = memo((props: ColumnConstraintsProps) => {
-    const styledConstraints = props.constraints.map((constraint, index) => (
-        <ColumnConstraint key={index} constraint={constraint} fontSize={props.fontSize} />
-    ))
     return (
         <ColumnConstraintsContainer sx={props.sx}>
-            {styledConstraints}
+            {
+                props.constraints.map((constraint, index) => (
+                    <ColumnConstraint key={index} constraint={constraint} fontSize={props.fontSize} />
+                ))
+            }
         </ColumnConstraintsContainer>
     )
 })

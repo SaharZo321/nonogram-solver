@@ -18,12 +18,7 @@ export const BoardContainerPage = (props: PropsWithChildren<BoardContainerProps>
     return (
         <BoardContainerWrapper>
             <BoardContainer {...props} />
-            {
-                props.children &&
-                <Box>
-                    {props.children}
-                </Box>
-            }
+            {props.children}
         </BoardContainerWrapper>
     )
 }

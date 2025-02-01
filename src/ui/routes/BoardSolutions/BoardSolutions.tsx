@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { BoardContainerPage } from "@components/Board/PageLayout";
 import { Location, useLocation, useNavigate } from "react-router-dom";
 import { Box, Button, IconButton, LinearProgress } from "@mui/material";
@@ -7,12 +7,14 @@ import { NavigateBefore, NavigateNext, Pause, PlayArrow } from "@mui/icons-mater
 import GridBitArray from "@board-utils/gridBitArray";
 import { StyledSlider } from "@components/General/StyledComponents";
 import { solve, SolverProps } from "./solver";
+import { SettingsContext } from "@renderer/App";
 
 
 
 
 export default function BoardSolutions() {
     const { state: boardReference }: Location<BoardInterface> = useLocation()
+    const { tileColor } = useContext(SettingsContext)
     const [shownBoard, setShownBoard] = useState(new Board(boardReference).emptyGrid())
     const [steps, setSteps] = useState<BoardSolution>([])
     const [position, setPosition] = useState(0)
@@ -37,7 +39,7 @@ export default function BoardSolutions() {
             }
         }
         return solve({ onMessage, boardConstraints: boardReference.constraints })
-        
+
 
     }, [])
 
@@ -69,7 +71,7 @@ export default function BoardSolutions() {
     }, [steps])
 
     return (
-        <BoardContainerPage board={shownBoard} interactable={false}>
+        <BoardContainerPage board={shownBoard} interactable={false} tileColor={tileColor} sizeVMin={60}>
             <Box display='flex' flexDirection='column' width={300} gap='16px'>
                 <Box display='flex' justifyContent='space-around'>
                     <IconButton

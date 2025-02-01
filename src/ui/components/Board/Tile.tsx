@@ -1,18 +1,14 @@
 import { Box, Icon, useTheme } from "@mui/material"
-import { memo, useCallback, useContext } from "react"
+import { memo, useCallback, useEffect } from "react"
 import { CloseRounded } from "@mui/icons-material"
 import styled from "@emotion/styled"
-import { BoardUtilsContext } from "./BoardContainer"
-
 
 
 type TileProps = {
     state: BoardTile
-    tileVMinSize: number,
-    position: {
-        row: number,
-        column: number,
-    }
+    hoverColor?: string,
+    tileColor?: string,
+    onChange?: (state: BoardTile) => void
 }
 
 const TileWrapper = styled(Box)`
@@ -34,52 +30,44 @@ const TileMask = styled.div`
    }
 `
 export const Tile = memo((props: TileProps) => {
-    const {interactable, hoverColor, setTile, mainDrawState} = useContext(BoardUtilsContext)
-    // const boardContext = useContext(BoardContext)
-    // const [tileState, setTileState] = useState(boardContext.board.getTile(props.position))
     const tileState = props.state
     const { mode } = useTheme().palette
-    const handleMouseDown = useCallback((button: number) => {
-        if (!interactable) return
-        switch (button) {
-            case 0: {
-                setTile?.(props.position, mainDrawState)
-            } break
-            case 2: {
-                setTile?.(props.position, "unmarked")
-            } break
-        }
-    }, [props.position])
 
-    const handleMouseOver = useCallback((buttons: number) => {
-        if (!interactable) return
-        switch (buttons) {
-            case 1: {
-                setTile?.(props.position, mainDrawState)
+    const handleMouseDown: React.MouseEventHandler = useCallback(event => {
+        event.preventDefault()
+        if (!props.onChange) return
+        switch (event.button) {
+            case 0: {
+                props.onChange("marked")
             } break
             case 2: {
-                setTile?.(props.position, "unmarked")
+                props.onChange("unmarked")
             } break
         }
-    }, [props.position])
+    }, [props.onChange])
+
+    const handleMouseOver: React.MouseEventHandler = useCallback(event => {
+        if (!props.onChange) return
+        switch (event.buttons) {
+            case 1: {
+                props.onChange("marked")
+            } break
+            case 2: {
+                props.onChange("unmarked")
+            } break
+        }
+    }, [props.onChange])
+
+    const disableContextMenu: React.MouseEventHandler = useCallback(event => event.preventDefault(), [])
 
     return (
         <TileWrapper
-            onMouseDown={event => {
-                event.preventDefault()
-                handleMouseDown(event.button)
-            }}
-            onMouseOver={event => {
-                handleMouseOver(event.buttons)
-            }}
-            onContextMenu={event => {
-                event.preventDefault()
-            }}
+            onMouseDown={handleMouseDown}
+            onMouseOver={handleMouseOver}
+            onContextMenu={disableContextMenu}
             sx={{
-                backgroundColor: tileState === "marked" ? 'black' : (mode === 'light' ? 'white' : 'lightgray'),
-                cursor: interactable ? 'pointer' : undefined,
-                height: `${props.tileVMinSize}vmin`,
-                width: `${props.tileVMinSize}vmin`,
+                backgroundColor: tileState === "marked" ? props.tileColor : (mode === 'light' ? 'white' : 'lightgray'),
+                cursor: props.onChange ? 'pointer' : undefined,
             }}
         >
             {
@@ -97,9 +85,9 @@ export const Tile = memo((props: TileProps) => {
                 </Icon>
             }
             {
-                interactable &&
-                <TileMask color={hoverColor} />
+                props.onChange &&
+                <TileMask color={props.hoverColor} />
             }
         </TileWrapper>
     )
-}, ({ state, tileVMinSize: tileSize }, { state: nextState, tileVMinSize: nextTileSize }) => state === nextState && tileSize === nextTileSize)
+}, (props, nextProps) => props.state === nextProps.state && props.hoverColor === nextProps.hoverColor && props.tileColor === nextProps.tileColor)

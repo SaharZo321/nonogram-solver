@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { useMemo } from "react";
 import { Tile } from "./Tile";
 import { Box, SxProps, styled } from "@mui/material";
 
@@ -8,7 +8,10 @@ type GridProps = {
     sx?: SxProps,
     tileSx?: SxProps,
     grid: BoardGrid,
-    tileSize: number,
+    interactable?: boolean,
+    onTileChange?: (position: Position, state: BoardTile) => void,
+    hoverColor?: string,
+    tileColor?: string
 }
 
 const GridContainer = styled(Box)(({ theme }) => ({
@@ -17,20 +20,27 @@ const GridContainer = styled(Box)(({ theme }) => ({
     outline: `0.5vmin solid ${theme.palette.mode === 'dark' ? 'lightgrey' : 'black'}`,
 
 }))
-export const Grid = memo((props: GridProps) => {
+export const Grid = (props: GridProps) => {
 
     const gridSize = props.grid.length
-    const gridAsArray = props.grid.reduce((accumulator, currentRow) => accumulator.concat(currentRow))
-        .map((tileState, index) => {
-            const position = {
-                row: Math.floor(index / gridSize),
-                column: index % gridSize
-            }
+    const gridAsArray = useMemo(() => (
+        props.grid.flatMap((row, rowIndex) => row.map((tileState, colIndex) => {
+                const position = {
+                    row: rowIndex,
+                    column: colIndex
+                }
 
-            return (
-                <Tile key={index} state={tileState} position={position} tileVMinSize={props.tileSize} />
-            )
-        })
+                return (
+                    <Tile
+                        key={`${rowIndex}-${colIndex}`}
+                        state={tileState}
+                        tileColor={props.tileColor}
+                        hoverColor={props.hoverColor}
+                        onChange={props.onTileChange ? state => props.onTileChange?.(position, state) : undefined}
+                    />
+                )
+            })
+    )), [props.grid, props.hoverColor, props.tileColor])
 
     return (
         <GridContainer sx={{
@@ -42,4 +52,4 @@ export const Grid = memo((props: GridProps) => {
             }
         </GridContainer >
     )
-})
+}
