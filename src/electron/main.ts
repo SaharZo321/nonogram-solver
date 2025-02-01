@@ -3,7 +3,7 @@ import { ipcMainHandle, ipcMainOn, ipcWebContentsSend, isDev, isMacOs } from './
 import { getPreloadPath, getUIPath } from './pathResolver.js'
 
 const minWindowSize = {
-    width: 900,
+    width: 960,
     height: 600,
 }
 
@@ -20,22 +20,6 @@ function menuTemplate(mainWindow: BrowserWindow) {
                     label: "Open DevTools",
                     click: () => mainWindow.webContents.openDevTools(),
                     visible: isDev()
-                }
-            ]
-        }, {
-            label: "Theme",
-            submenu: [
-                {
-                    label: "System",
-                    click: () => nativeTheme.themeSource = "system"
-                },
-                {
-                    label: "Light",
-                    click: () => nativeTheme.themeSource = "light"
-                },
-                {
-                    label: "Dark",
-                    click: () => nativeTheme.themeSource = "dark"
                 },
             ]
         }

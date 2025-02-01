@@ -1,6 +1,4 @@
 import { ipcMain, WebContents, WebFrameMain } from "electron"
-import { pathToFileURL } from "url"
-import { getUIPath } from "./pathResolver.js"
 
 export function isDev(): boolean {
     return process.env.NODE_ENV === "development"
@@ -10,7 +8,7 @@ export function isMacOs(): boolean {
 }
 
 export function ipcMainHandle<Key extends keyof EventPayloadMapping>(key: Key, handler: (payload: EventPayloadMapping[Key]) => void) {
-    ipcMain.handle(key, (event, payload) => {
+    ipcMain.handle(key, (_, payload) => {
         // validateEventFrame(event.senderFrame)
         return handler(payload)
     })
@@ -20,8 +18,7 @@ export function ipcMainOn<Key extends keyof EventPayloadMapping>(
     key: Key,
     handler: (payload: EventPayloadMapping[Key]) => void,
 ) {
-    ipcMain.on(key, (event, payload) => {
-        // validateEventFrame(event.senderFrame)
+    ipcMain.on(key, (_, payload) => {
         return handler(payload)
     })
 }

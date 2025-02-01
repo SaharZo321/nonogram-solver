@@ -1,7 +1,7 @@
 # Nonogram Board Solver
 
 The app lets you create your own Nonogram board and solves it for you with steps.
-This project is a remake of my highschool project written in Typescript, React.
+This project is a remake of my highschool project written in Typescript, React with Electron.
 
 ## Whats in this app?
 

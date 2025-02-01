@@ -3,16 +3,19 @@ import { CssBaseline, PaletteMode, createTheme } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import TitleBar from "@components/Navbar/TitleBar";
 import CustomThemeProvider from "./providers/CustomThemeProvider";
+import SettingsModal from "@components/Settings/Settings";
 
 
 
 export type Settings = {
     hoverColor: string,
+    tileColor: string,
     colorMode: PaletteMode | "system",
 }
 
 const defaultSettings: Settings = {
-    hoverColor: 'rgba(150,150,150,0.3)',
+    hoverColor: '#3a3a3a',
+    tileColor: '#000000',
     colorMode: "system",
 }
 
@@ -27,6 +30,7 @@ function App() {
     const [themeMode, setThemeMode] = useState<PaletteMode>("dark")
     const [isDev, setIsDev] = useState<boolean>(false)
     const [isMacOs, setIsMacOs] = useState<boolean>(false)
+    const [settingsModal, setSettingsModal] = useState<boolean>(false)
 
     const setSetting = useCallback(<Key extends keyof Settings>(key: Key, value: Settings[Key]) => {
         setSettings(prev => ({
@@ -34,6 +38,7 @@ function App() {
             [key]: value
         }))
     }, [])
+
 
     useEffect(() => {
         if (isMacOs) {
@@ -72,6 +77,26 @@ function App() {
                 palette: {
                     mode: themeMode,
                 },
+                components: {
+                    MuiCssBaseline: {
+                        styleOverrides: {
+                            "::-webkit-scrollbar": {
+                                width: "10px",
+                                height: "10px",
+                            },
+                            "::-webkit-scrollbar-track": {
+                                background: "#8080801c",
+                            },
+                            "::-webkit-scrollbar-thumb": {
+                                background: "#87878764",
+                                borderRadius: "5px",
+                            },
+                            "::-webkit-scrollbar-thumb:hover": {
+                                background: "#7c7c7cb5",
+                            },
+                        },
+                    },
+                }
             }),
         [themeMode],
     );
@@ -79,15 +104,17 @@ function App() {
     return (
         <SettingsContext.Provider value={settings}>
             <CustomThemeProvider theme={theme}>
-                <CssBaseline />
+                <CssBaseline enableColorScheme />
                 <TitleBar
                     isDev={isDev}
                     onQuit={() => window.electron.sendFrameAction("QUIT")}
                     onOpenDevTools={() => window.electron.sendFrameAction("OPEN_DEVTOOLS")}
                     backgroundColor={TITLEBAR_COLOR[themeMode]}
-                    setSetting={setSetting}
+                    openSettings={() => setSettingsModal(true)}
+                    isMacOs={isMacOs}
                 />
                 <Outlet />
+                <SettingsModal open={settingsModal} onClose={() => setSettingsModal(false)} setSetting={setSetting} />
             </CustomThemeProvider>
         </SettingsContext.Provider>
     )
