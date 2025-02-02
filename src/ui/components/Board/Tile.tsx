@@ -1,5 +1,5 @@
 import { Box, Icon, useTheme } from "@mui/material"
-import { memo, useCallback, useEffect } from "react"
+import { memo, useCallback } from "react"
 import { CloseRounded } from "@mui/icons-material"
 import styled from "@emotion/styled"
 

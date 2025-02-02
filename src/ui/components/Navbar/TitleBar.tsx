@@ -1,5 +1,5 @@
 import { Box, ClickAwayListener, MenuItem, MenuList, Paper, Popper, styled } from "@mui/material"
-import { PropsWithChildren, useCallback, useRef, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 
 
 
@@ -113,8 +113,9 @@ function TitleBarMenu(props: TitleBarMenuProps) {
                     <ClickAwayListener onClickAway={handleMenuClose}>
                         <MenuList>
                             {
-                                props.buttons.map(({ label, onClick, hidden, selected }) => !hidden ? (
+                                props.buttons.map(({ label, onClick, hidden, selected }, index) => !hidden ? (
                                     <MenuItem
+                                        key={index}
                                         dense
                                         onClick={() => {
                                             onClick?.()

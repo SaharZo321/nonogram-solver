@@ -1,17 +1,22 @@
 import { Box, SxProps, Typography, styled } from "@mui/material"
-import { memo, useEffect } from "react"
+import { memo } from "react"
 
 type RowConstraintsProps = {
     constraints: BoardConstraints['rows'],
     sx?: SxProps,
     fontSize: string,
+    onConstraintClick?: (index: number) => void
 }
 
 const RowConstraintContainer = styled(Box)({
     display: 'flex',
     justifyContent: 'flex-end',
-    alignItems: 'stretch',
+    border: "solid 2px lightgray",
+    boxSizing: "border-box",
     flexBasis: '100%',
+    alignItems: 'center',
+    borderRadius: "8px",
+    paddingRight: "3px"
 })
 
 
@@ -23,11 +28,19 @@ const RowConstraintsContainer = styled(Box)({
 type ConstraintProps = {
     constraint: number[],
     fontSize: string
+    onClick?: () => void
 }
 
 const RowConstraint = memo((props: ConstraintProps) => {
     return (
-        <RowConstraintContainer>
+        <RowConstraintContainer 
+            onClick={props.onClick}
+            sx={{
+                "&:hover": {
+                    cursor: props.onClick ? "pointer" : undefined,
+                },
+            }}
+        >
             <Typography fontSize={props.fontSize} alignSelf="center">
                 {props.constraint.join(" ")}
             </Typography>
@@ -40,7 +53,12 @@ export const RowsConstraints = memo((props: RowConstraintsProps) => {
         <RowConstraintsContainer sx={props.sx}>
             {
                 props.constraints.map((constraint, index) => (
-                    <RowConstraint key={index} constraint={constraint} fontSize={props.fontSize} />
+                    <RowConstraint
+                        key={index}
+                        constraint={constraint}
+                        fontSize={props.fontSize}
+                        onClick={props.onConstraintClick ? () => props.onConstraintClick?.(index) : undefined}
+                    />
                 ))
             }
         </RowConstraintsContainer>
@@ -57,17 +75,27 @@ const ColumnConstraintContainer = styled(Box)({
     flexBasis: '100%',
     alignItems: 'center',
     flexDirection: 'column',
+    border: "solid 2px lightgray",
+    borderRadius: "8px"
 })
 
 type ColumnConstraintsProps = {
     constraints: BoardConstraints['columns'],
     sx?: SxProps,
     fontSize: string,
+    onConstraintClick?: (index: number) => void
 }
 
 const ColumnConstraint = memo((props: ConstraintProps) => {
     return (
-        <ColumnConstraintContainer>
+        <ColumnConstraintContainer
+            onClick={props.onClick}
+            sx={{
+                "&:hover": {
+                    cursor: props.onClick ? "pointer" : undefined,
+                },
+            }}
+        >
             {
                 props.constraint.map((number, index) => (
                     <Typography key={index}
@@ -89,7 +117,12 @@ export const ColumnConstraints = memo((props: ColumnConstraintsProps) => {
         <ColumnConstraintsContainer sx={props.sx}>
             {
                 props.constraints.map((constraint, index) => (
-                    <ColumnConstraint key={index} constraint={constraint} fontSize={props.fontSize} />
+                    <ColumnConstraint
+                        key={index}
+                        constraint={constraint}
+                        fontSize={props.fontSize}
+                        onClick={props.onConstraintClick ? () => props.onConstraintClick?.(index): undefined}
+                    />
                 ))
             }
         </ColumnConstraintsContainer>

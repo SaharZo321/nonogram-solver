@@ -175,8 +175,9 @@ export default class Board implements BoardInterface{
         })
     }
 
-    get isGridEmpty() {
-        return this.grid.every(row => row.every(tile => tile !== "marked"))
+    get isBoardEmpty() {
+        return this.constraints.rows.every(row => row.length === 0) || 
+            this.constraints.columns.every(column => column.length === 0)
     }
 
     emptyGrid() {

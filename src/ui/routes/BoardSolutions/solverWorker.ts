@@ -38,7 +38,9 @@ function solver(constraints: BoardConstraints): BoardSolution {
         bitArray.emptyRow(rowIndex);
         return false;
     }
-    solve(new GridBitArray(size))
+    if (!solve(new GridBitArray(size))) {
+        steps.push(GridBitArray.getEmpty(size * size))
+    }
     return steps
 
 }

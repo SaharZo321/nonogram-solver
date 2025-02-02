@@ -1,7 +1,7 @@
 import { Box, Button, List, ListItem, SliderProps, Typography, } from "@mui/material";
 
 import Board from "@board-utils/board";
-import { PropsWithChildren, useCallback, useContext, useEffect, useReducer, useState } from "react";
+import { PropsWithChildren, useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import styled from "@emotion/styled";
 import { useDebouncedCallback } from "use-debounce";
 import { Flip, RotateLeftRounded, RotateRightRounded } from "@mui/icons-material";
@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { StyledButton, StyledSlider } from "@components/General/StyledComponents";
 import { SettingsContext } from "@renderer/App";
 import { Mark } from "@mui/material/Slider/useSlider.types";
+import ConstraintDialog from "./ConstraintDialog";
 
 const defaultSize = 10
 const demoBoard = new Board({ size: defaultSize })
@@ -78,6 +79,12 @@ export default function BoardCreation() {
     const { hoverColor, tileColor } = useContext(SettingsContext)
     const [board, dispatchBoard] = useReducer(boardReducer, demoBoard)
     const [randomMarkingChance, setMarkingChance] = useState(DEFAULT_CHANCE)
+    const [clickedConstraint, setClickedConstraint] = useState<{ type: "row" | "column", index: number }>()
+
+    useEffect(() => {
+        dispatchBoard({ type: "reset-board" })
+    }, [])
+
     const navigate = useNavigate()
 
     const handleBoardSizeChange = useDebouncedCallback<NonNullable<SliderProps["onChange"]>>((_, value) => {
@@ -113,18 +120,30 @@ export default function BoardCreation() {
     }, [])
 
     const handleShowSolution = useCallback(() => {
-        if (board.isGridEmpty) {
-            alert('Cannot solve an empty grid!')
+        if (board.isBoardEmpty) {
+            alert('Cannot solve an empty board!')
         } else {
             navigate('/board-solutions', {
                 state: board
             })
+            dispatchBoard({ type: "reset-board" })
         }
     }, [board])
 
     const randomizeBoard = useCallback(() => {
         dispatchBoard({ type: 'randomize', markingChance: randomMarkingChance })
     }, [randomMarkingChance])
+
+    const initialConstraint = useMemo(() => (
+        !clickedConstraint ? [] : board.constraints[`${clickedConstraint.type}s`][clickedConstraint.index]
+    ), [clickedConstraint, board])
+
+    const handleConstraintDialogSave = (constraint: LineConstraint) => {
+        if (!clickedConstraint) {
+            return
+        }
+        board.constraints[`${clickedConstraint.type}s`][clickedConstraint.index] = constraint
+    }
 
     return (
 
@@ -135,6 +154,7 @@ export default function BoardCreation() {
             hoverColor={hoverColor}
             tileColor={tileColor}
             sizeVMin={60}
+            onConstraintClick={setClickedConstraint}
         >
             <List>
                 <BoardUtilsItem text="Board Size">
@@ -159,7 +179,6 @@ export default function BoardCreation() {
                 <BoardUtilsItem>
                     <Box sx={{
                         display: 'flex',
-                        // gap: '16px',
                         justifyContent: 'space-between',
                         width: '100%',
                         flexDirection: 'row',
@@ -198,6 +217,15 @@ export default function BoardCreation() {
                 </BoardUtilsItem>
 
             </List>
+            <ConstraintDialog
+                open={!!clickedConstraint}
+                index={clickedConstraint?.index}
+                type={clickedConstraint?.type}
+                onSave={handleConstraintDialogSave}
+                onClose={() => setClickedConstraint(undefined)}
+                initialConstraint={initialConstraint}
+                maxSize={board.size}
+            />
         </BoardContainerPage>
     )
 }
