@@ -26,14 +26,15 @@ The app lets you draw and customize your own board with some utilities:
 
 The app makes its own constraints while customizing your board.
 
+- Another option is to edit the constraints manually, which can help you solve unknown boards!
+
 When you are done creating, you can let computer solve the board by using its constraints.
-The solution has the steps used for the computer to solve the board.
 
 ## So, how does it solve?
 
 The algorithm used to solve the board is a backtracking algorithm. I researched the web and combined some of what I found and modified it.
 
-### First step - getting all the solutions for the rows in the board
+### STEP #1 - getting all the solutions for the rows in the board
 
 This is my first modification:
 
@@ -43,11 +44,11 @@ Each row may have more than 1 solution by itself.
 
 The solutions are created by using only the rows constraints.
 
-### Second step - going through all the possible solutions to complete a board
+### STEP #2 - going through all the possible solutions to complete a board
 
-Now, all left to do is just go through all the row solutions created to complete a board by checking the column constraints.
+What's left to do is iterate over all the row solutions which were found, and complete a board by checking the column constraints.
 
-The algorithm used is Back-tracking. Every step adds a new row solution to the board. If successfully, adds another, otherwise it will back-track to the old board, until the board is complete.
+The algorithm used is Back-tracking. Every step adds a new row solution to the current board. If successfully, adds another, otherwise it will back-track to the old board, until the board is complete.
 
 <img src="./public/videos/solve.gif" width=400/>
 
@@ -59,10 +60,10 @@ The algorithm used is Back-tracking. Every step adds a new row solution to the b
 
 However, this got me to some trouble - **THERE WERE SO MANY STEPS**
 
-With a large board, a solution can have more than **10,000,000 steps**, which cost me more memory than I have on my computer!
+With a large board, a solution can have more than **10,000,000 steps**.
 
-I had to manage the snapshot to use the lowest amount of memory. Then, I found the **BIT ARRAYS** as a solution.
+I had to manage the snapshot to use the lowest amount of memory. Then, I found **BIT ARRAYS** as a solution.
 
-Because Nonogram boards have only 2 colors, a bit array is the perfect data structure to save a snapshot of the grid.
+Because Nonogram boards have only 2 colors, a bit array is a super efficient data structure to save a snapshot of the grid.
 
-This exteremely reduced the amount of memory used to solve the large boards.
+This extremely reduced the amount of memory used to solve the large boards.
