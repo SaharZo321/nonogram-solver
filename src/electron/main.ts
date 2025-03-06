@@ -72,14 +72,14 @@ function createWindow() {
     })
 
     ipcMainOn("setTitleBarOverlay", payload => {
-        if (!isMacOs()) return;
+        if (isMacOs()) return;
         mainWindow.setTitleBarOverlay(payload)
     })
 
     ipcMainHandle("getSystemTheme", () => nativeTheme.shouldUseDarkColors ? "dark" : "light")
 
     if (isMacOs()) {
-        mainWindow.setMenu(menuTemplate(mainWindow))
+        Menu.setApplicationMenu(menuTemplate(mainWindow))
     }
 }
 
