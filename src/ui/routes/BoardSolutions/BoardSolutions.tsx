@@ -39,10 +39,6 @@ export default function BoardSolutions() {
             }
         }
 
-        const onError: SolverProps["onError"] = () => {
-            
-        }
-
         return solve({ onMessage, boardConstraints: boardReference.constraints, frequencyMS: 250})
 
 
