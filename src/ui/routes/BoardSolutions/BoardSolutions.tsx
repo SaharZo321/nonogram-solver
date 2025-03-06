@@ -38,7 +38,12 @@ export default function BoardSolutions() {
                 setAnimationParams({ step, interval })
             }
         }
-        return solve({ onMessage, boardConstraints: boardReference.constraints })
+
+        const onError: SolverProps["onError"] = () => {
+            
+        }
+
+        return solve({ onMessage, boardConstraints: boardReference.constraints, frequencyMS: 250})
 
 
     }, [])

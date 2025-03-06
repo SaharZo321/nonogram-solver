@@ -72,6 +72,7 @@ function createWindow() {
     })
 
     ipcMainOn("setTitleBarOverlay", payload => {
+        if (!isMacOs()) return;
         mainWindow.setTitleBarOverlay(payload)
     })
 
