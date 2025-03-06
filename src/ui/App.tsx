@@ -41,9 +41,9 @@ function App() {
 
 
     useEffect(() => {
-        if (isMacOs) {
-            return window.electron.subscribeThemeChange(setThemeMode)
-        }
+        // if (isMacOs) {
+        //     return window.electron.subscribeThemeChange(setThemeMode)
+        // }
         switch (settings.colorMode) {
             case "system": {
                 (async () => {
